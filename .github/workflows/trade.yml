@@ -3,6 +3,7 @@ name: Daily Trade
 on:
   schedule:
     - cron: '45 13 * * 1-5'
+    workflow_dispatch:
 
 jobs:
   trade:
