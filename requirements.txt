@@ -1,12 +1,5 @@
-<<<<<<< HEAD
 yfinance
 pandas
-matplotlib
 scikit-learn
-=======
-yfinance
-pandas
-matplotlib
-scikit-learn
->>>>>>> de7ab959d2f3f2b553fad595ca68218d23d31d41
 alpaca-py
+python-dotenv
