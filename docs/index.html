@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trading Arena</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg-main: #020617;
+    --bg-card: #0f172a;
+    --bg-card-alt: #1e293b;
+    --border: #1e293b;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #475569;
+    --green: #4ade80;
+    --red: #f87171;
+    --cyan: #22d3ee;
+    --mono: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', monospace;
+  }
+
+  body {
+    background: var(--bg-main);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    padding: 16px;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .header-left .eyebrow {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+
+  .header-left h1 {
+    font-family: var(--mono);
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .header-stats {
+    display: flex;
+    gap: 24px;
+    align-items: flex-end;
+  }
+
+  .header-stat {
+    text-align: right;
+  }
+
+  .header-stat .label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+  }
+
+  .header-stat .value {
+    font-family: var(--mono);
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .model-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .model-banner .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    background: var(--cyan);
+  }
+
+  .model-banner .name {
+    font-family: var(--mono);
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .model-banner .subtitle {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(34, 211, 238, 0.12);
+    border: 1px solid rgba(34, 211, 238, 0.4);
+    color: var(--cyan);
+  }
+
+  .status-badge .pulse {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 6px var(--cyan);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .chart-container {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .chart-container canvas {
+    width: 100% !important;
+    max-height: 280px;
+  }
+
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .metric-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+
+  .metric-card .label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+
+  .metric-card .value {
+    font-family: var(--mono);
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .positions-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    overflow-x: auto;
+  }
+
+  .positions-section h2 {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+  }
+
+  .positions-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--mono);
+    font-size: 13px;
+    min-width: 500px;
+  }
+
+  .positions-table th {
+    text-align: left;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--border);
+    text-transform: uppercase;
+  }
+
+  .positions-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid rgba(30, 41, 59, 0.5);
+    color: var(--text-primary);
+  }
+
+  .up { color: var(--green); }
+  .down { color: var(--red); }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+    font-family: var(--mono);
+    font-size: 14px;
+  }
+
+  .empty-state .icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+    opacity: 0.4;
+  }
+
+  .last-updated {
+    text-align: center;
+    margin-top: 16px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+
+  .error-banner {
+    background: rgba(248, 113, 113, 0.1);
+    border: 1px solid rgba(248, 113, 113, 0.3);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--red);
+  }
+
+  @media (max-width: 480px) {
+    body { padding: 12px; }
+    .header-stat .value { font-size: 16px; }
+    .header-stats { gap: 16px; }
+    .metric-card .value { font-size: 15px; }
+    .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="eyebrow">STOCK_PREDICTOR</div>
+    <h1>Trading Arena</h1>
+  </div>
+  <div class="header-stats">
+    <div class="header-stat">
+      <div class="label">EQUITY</div>
+      <div class="value" id="total-equity">—</div>
+    </div>
+    <div class="header-stat">
+      <div class="label">TOTAL P&L</div>
+      <div class="value" id="total-pnl">—</div>
+    </div>
+  </div>
+</div>
+
+<div class="model-banner">
+  <span class="dot"></span>
+  <span class="name">Model A</span>
+  <span class="subtitle">· Technical ML · Random Forest</span>
+  <span class="status-badge"><span class="pulse"></span>LIVE</span>
+</div>
+
+<div id="error-container"></div>
+
+<div class="chart-container">
+  <canvas id="equity-chart"></canvas>
+</div>
+
+<div class="metrics-grid" id="metrics-grid"></div>
+
+<div class="positions-section">
+  <h2>Open positions</h2>
+  <div id="positions-container">
+    <div class="empty-state">
+      <div class="icon">⏳</div>
+      Loading...
+    </div>
+  </div>
+</div>
+
+<div class="last-updated" id="last-updated"></div>
+
+<script>
+// ===================================================
+// CONFIG — update this to your repo
+// ===================================================
+const REPO_OWNER = "kareemhsalama";
+const REPO_NAME = "stock_predictor";
+const BRANCH = "main";
+const LEDGER_FILE = "data/model_a_ledger.json";
+const INITIAL_BUDGET = 25000;
+
+const LEDGER_URL = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}/${LEDGER_FILE}`;
+
+// ===================================================
+// Metric computation
+// ===================================================
+function computeMetrics(snapshots) {
+  if (snapshots.length === 0) return null;
+
+  const latest = snapshots[snapshots.length - 1];
+  const equity = latest.equity;
+  const pnl = equity - INITIAL_BUDGET;
+  const totalReturn = (pnl / INITIAL_BUDGET) * 100;
+
+  // daily returns
+  const dailyReturns = [];
+  for (let i = 1; i < snapshots.length; i++) {
+    const prev = snapshots[i - 1].equity;
+    const curr = snapshots[i].equity;
+    dailyReturns.push((curr - prev) / prev);
+  }
+
+  // sharpe ratio (annualized)
+  let sharpe = 0;
+  if (dailyReturns.length > 1) {
+    const avg = dailyReturns.reduce((a, b) => a + b, 0) / dailyReturns.length;
+    const std = Math.sqrt(dailyReturns.reduce((a, b) => a + (b - avg) ** 2, 0) / dailyReturns.length);
+    sharpe = std > 0 ? (avg / std) * Math.sqrt(252) : 0;
+  }
+
+  // win rate (days with positive return)
+  const wins = dailyReturns.filter(r => r > 0).length;
+  const losses = dailyReturns.filter(r => r <= 0).length;
+  const winRate = dailyReturns.length > 0 ? wins / dailyReturns.length : 0;
+
+  // max drawdown
+  let maxEquity = 0;
+  let maxDrawdown = 0;
+  for (const s of snapshots) {
+    maxEquity = Math.max(maxEquity, s.equity);
+    const dd = (maxEquity - s.equity) / maxEquity;
+    maxDrawdown = Math.max(maxDrawdown, dd);
+  }
+
+  return {
+    equity,
+    pnl,
+    totalReturn,
+    sharpe,
+    winRate,
+    maxDrawdown,
+    tradingDays: snapshots.length,
+    wins,
+    losses,
+    latestDate: latest.date,
+    positions: latest.positions || [],
+  };
+}
+
+// ===================================================
+// Rendering
+// ===================================================
+function renderMetrics(m) {
+  document.getElementById("total-equity").textContent = `$${m.equity.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+
+  const pnlEl = document.getElementById("total-pnl");
+  pnlEl.textContent = `${m.pnl >= 0 ? "+" : "-"}$${Math.abs(m.pnl).toFixed(0)}`;
+  pnlEl.className = `value ${m.pnl >= 0 ? "up" : "down"}`;
+
+  const metrics = [
+    { label: "Return", value: `${m.totalReturn >= 0 ? "+" : ""}${m.totalReturn.toFixed(2)}%`, good: m.totalReturn >= 0 },
+    { label: "Sharpe ratio", value: m.sharpe.toFixed(2), good: m.sharpe > 1 },
+    { label: "Win rate", value: `${(m.winRate * 100).toFixed(1)}%`, good: m.winRate > 0.5 },
+    { label: "Max drawdown", value: `${(m.maxDrawdown * 100).toFixed(2)}%`, good: m.maxDrawdown < 0.1 },
+    { label: "Trading days", value: m.tradingDays, good: null },
+    { label: "W / L", value: `${m.wins} / ${m.losses}`, good: m.wins > m.losses },
+  ];
+
+  const grid = document.getElementById("metrics-grid");
+  grid.innerHTML = metrics.map(met => `
+    <div class="metric-card">
+      <div class="label">${met.label}</div>
+      <div class="value ${met.good === null ? "" : met.good ? "up" : "down"}">${met.value}</div>
+    </div>
+  `).join("");
+}
+
+function renderPositions(positions) {
+  const container = document.getElementById("positions-container");
+  if (!positions || positions.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">📭</div>No open positions</div>`;
+    return;
+  }
+
+  container.innerHTML = `
+    <table class="positions-table">
+      <thead>
+        <tr>
+          <th>Symbol</th>
+          <th>Qty</th>
+          <th>Avg entry</th>
+          <th>Current</th>
+          <th>P&L</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${positions.map(p => `
+          <tr>
+            <td style="font-weight:700">${p.symbol}</td>
+            <td>${p.qty}</td>
+            <td>$${parseFloat(p.avg_entry).toFixed(2)}</td>
+            <td>$${parseFloat(p.current_price).toFixed(2)}</td>
+            <td class="${p.unrealized_pnl >= 0 ? "up" : "down"}">
+              ${p.unrealized_pnl >= 0 ? "+" : "-"}$${Math.abs(p.unrealized_pnl).toFixed(2)}
+            </td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
+}
+
+let chartInstance = null;
+
+function renderChart(snapshots) {
+  const ctx = document.getElementById("equity-chart").getContext("2d");
+
+  if (chartInstance) chartInstance.destroy();
+
+  const labels = snapshots.map(s => s.date);
+  const data = snapshots.map(s => s.equity);
+
+  chartInstance = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [{
+        label: "Equity",
+        data,
+        borderColor: "#22d3ee",
+        backgroundColor: "rgba(34, 211, 238, 0.08)",
+        fill: true,
+        tension: 0.3,
+        pointRadius: 0,
+        pointHitRadius: 10,
+        borderWidth: 2,
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { intersect: false, mode: "index" },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: "#0f172a",
+          borderColor: "#1e293b",
+          borderWidth: 1,
+          titleFont: { family: "'JetBrains Mono', monospace", size: 11 },
+          bodyFont: { family: "'JetBrains Mono', monospace", size: 13 },
+          padding: 10,
+          callbacks: {
+            label: (ctx) => `$${ctx.parsed.y.toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+          },
+        },
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: "#475569",
+            font: { family: "'JetBrains Mono', monospace", size: 10 },
+            maxTicksLimit: 8,
+          },
+          grid: { color: "rgba(30, 41, 59, 0.5)" },
+          border: { color: "#1e293b" },
+        },
+        y: {
+          ticks: {
+            color: "#475569",
+            font: { family: "'JetBrains Mono', monospace", size: 10 },
+            callback: (v) => `$${(v / 1000).toFixed(1)}k`,
+          },
+          grid: { color: "rgba(30, 41, 59, 0.5)" },
+          border: { display: false },
+        },
+      },
+    },
+  });
+
+  // baseline reference line
+  const baselinePlugin = {
+    id: "baseline",
+    afterDraw(chart) {
+      const yScale = chart.scales.y;
+      const y = yScale.getPixelForValue(INITIAL_BUDGET);
+      const ctx = chart.ctx;
+      ctx.save();
+      ctx.setLineDash([4, 4]);
+      ctx.strokeStyle = "#334155";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(chart.chartArea.left, y);
+      ctx.lineTo(chart.chartArea.right, y);
+      ctx.stroke();
+      ctx.fillStyle = "#475569";
+      ctx.font = "10px 'JetBrains Mono', monospace";
+      ctx.fillText("$25k initial", chart.chartArea.right - 70, y - 6);
+      ctx.restore();
+    },
+  };
+
+  chartInstance.config.plugins = [baselinePlugin];
+  chartInstance.update();
+}
+
+function showError(msg) {
+  document.getElementById("error-container").innerHTML =
+    `<div class="error-banner">${msg}</div>`;
+}
+
+// ===================================================
+// Init
+// ===================================================
+async function init() {
+  try {
+    const resp = await fetch(LEDGER_URL);
+    if (!resp.ok) throw new Error(`Failed to fetch ledger (${resp.status})`);
+
+    const ledger = await resp.json();
+    const snapshots = ledger.snapshots || [];
+
+    if (snapshots.length === 0) {
+      document.getElementById("positions-container").innerHTML =
+        `<div class="empty-state"><div class="icon">📡</div>No snapshots yet — run the action manually to seed data</div>`;
+      return;
+    }
+
+    const m = computeMetrics(snapshots);
+    renderChart(snapshots);
+    renderMetrics(m);
+    renderPositions(m.positions);
+
+    document.getElementById("last-updated").textContent =
+      `Last snapshot: ${m.latestDate}`;
+  } catch (err) {
+    console.error(err);
+    showError(`Could not load ledger — make sure the repo and file path are correct. (${err.message})`);
+  }
+}
+
+init();
+</script>
+</body>
+</html>
