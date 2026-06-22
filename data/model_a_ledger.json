@@ -19,6 +19,41 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-06-22",
+      "equity": 99679.71,
+      "cash": 74239.33,
+      "pnl": 74679.71,
+      "positions": [
+        {
+          "symbol": "AAPL",
+          "qty": 30.0,
+          "avg_entry": 299.6,
+          "current_price": 297.13,
+          "market_value": 8913.9,
+          "unrealized_pnl": -74.1,
+          "side": "long"
+        },
+        {
+          "symbol": "MSFT",
+          "qty": 24.0,
+          "avg_entry": 368.168334,
+          "current_price": 367.96,
+          "market_value": 8831.04,
+          "unrealized_pnl": -5.000016,
+          "side": "long"
+        },
+        {
+          "symbol": "TSLA",
+          "qty": 19.0,
+          "avg_entry": 407.627895,
+          "current_price": 405.02,
+          "market_value": 7695.38,
+          "unrealized_pnl": -49.550005,
+          "side": "long"
+        }
+      ]
     }
   ]
 }
