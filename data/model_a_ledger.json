@@ -254,6 +254,41 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-07-02",
+      "equity": 99965.73,
+      "cash": 74480.17,
+      "pnl": 74965.73,
+      "positions": [
+        {
+          "symbol": "AAPL",
+          "qty": 29.0,
+          "avg_entry": 277.26,
+          "current_price": 308.06,
+          "market_value": 8933.74,
+          "unrealized_pnl": 893.2,
+          "side": "long"
+        },
+        {
+          "symbol": "GOOGL",
+          "qty": 20.0,
+          "avg_entry": 355.8,
+          "current_price": 358.8,
+          "market_value": 7176.0,
+          "unrealized_pnl": 60.0,
+          "side": "long"
+        },
+        {
+          "symbol": "MSFT",
+          "qty": 24.0,
+          "avg_entry": 386.01,
+          "current_price": 390.659,
+          "market_value": 9375.816,
+          "unrealized_pnl": 111.576,
+          "side": "long"
+        }
+      ]
     }
   ]
 }
