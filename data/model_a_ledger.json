@@ -420,6 +420,23 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-07-09",
+      "equity": 99957.91,
+      "cash": 82368.25,
+      "pnl": 74957.91,
+      "positions": [
+        {
+          "symbol": "NVDA",
+          "qty": 87.0,
+          "avg_entry": 196.144828,
+          "current_price": 202.18,
+          "market_value": 17589.66,
+          "unrealized_pnl": 525.059964,
+          "side": "long"
+        }
+      ]
     }
   ]
 }
