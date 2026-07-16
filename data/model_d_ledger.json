@@ -1,0 +1,14 @@
+{
+  "model": "D",
+  "name": "Mean Reversion (Z-Score)",
+  "initial_budget": 100000.0,
+  "snapshots": [
+    {
+      "date": "2026-07-16",
+      "equity": 100000.0,
+      "cash": 100000.0,
+      "pnl": 0.0,
+      "positions": []
+    }
+  ]
+}
