@@ -1,0 +1,43 @@
+name: Snapshot Model D Ledger
+
+on:
+  schedule:
+    # 21:45 UTC — 15 min after Model A's snapshot, past the US close.
+    - cron: "45 21 * * 1-5"
+  workflow_dispatch: # manual trigger for testing
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Take portfolio snapshot
+        run: python scripts/snapshot_ledger.py
+        env:
+          # Point the shared snapshot script at Model D's account + ledger.
+          ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY_D }}
+          ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY_D }}
+          LEDGER_PATH: data/model_d_ledger.json
+          MODEL_ID: D
+          MODEL_NAME: Mean Reversion (Z-Score)
+
+      - name: Commit ledger update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/model_d_ledger.json
+          git diff --cached --quiet || git commit -m "snapshot: Model D $(date -u +%Y-%m-%d)"
+          git push

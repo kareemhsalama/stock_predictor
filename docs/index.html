@@ -21,6 +21,7 @@
     --green: #4ade80;
     --red: #f87171;
     --cyan: #22d3ee;
+    --amber: #fbbf24;
     --mono: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', monospace;
   }
 
@@ -65,9 +66,7 @@
     align-items: flex-end;
   }
 
-  .header-stat {
-    text-align: right;
-  }
+  .header-stat { text-align: right; }
 
   .header-stat .label {
     font-family: var(--mono);
@@ -82,11 +81,51 @@
     font-weight: 700;
   }
 
+  /* --- market sections --- */
+  .market-section { margin-bottom: 28px; }
+
+  .section-title {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+
+  .section-title .name {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+  }
+
+  .section-title .agg {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* --- model panels --- */
+  .panels {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 16px;
+  }
+
+  .model-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+  }
+
   .model-banner {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
     flex-wrap: wrap;
   }
 
@@ -99,12 +138,12 @@
 
   .model-banner .name {
     font-family: var(--mono);
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 700;
   }
 
   .model-banner .subtitle {
-    font-size: 13px;
+    font-size: 12px;
     color: var(--text-secondary);
   }
 
@@ -113,7 +152,7 @@
     align-items: center;
     gap: 5px;
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 600;
     letter-spacing: 0.08em;
     padding: 2px 8px;
@@ -121,6 +160,13 @@
     background: rgba(34, 211, 238, 0.12);
     border: 1px solid rgba(34, 211, 238, 0.4);
     color: var(--cyan);
+    margin-left: auto;
+  }
+
+  .status-badge.offline {
+    background: rgba(71, 85, 105, 0.15);
+    border-color: rgba(71, 85, 105, 0.5);
+    color: var(--text-muted);
   }
 
   .status-badge .pulse {
@@ -137,37 +183,37 @@
     50% { opacity: 0.4; }
   }
 
-  .chart-container {
-    background: var(--bg-card);
+  .chart-wrap {
+    background: var(--bg-main);
     border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px;
-    margin-bottom: 16px;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 12px;
   }
 
-  .chart-container canvas {
+  .chart-wrap canvas {
     width: 100% !important;
-    max-height: 280px;
+    max-height: 200px;
   }
 
   .metrics-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 10px;
-    margin-bottom: 16px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
   }
 
   .metric-card {
-    background: var(--bg-card);
+    background: var(--bg-card-alt);
     border: 1px solid var(--border);
     border-radius: 8px;
-    padding: 10px 12px;
+    padding: 8px 10px;
   }
 
   .metric-card .label {
     font-family: var(--mono);
-    font-size: 9px;
-    letter-spacing: 0.08em;
+    font-size: 8px;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--text-muted);
     margin-bottom: 4px;
@@ -175,48 +221,39 @@
 
   .metric-card .value {
     font-family: var(--mono);
-    font-size: 18px;
+    font-size: 15px;
     font-weight: 700;
   }
 
-  .positions-section {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px;
-    overflow-x: auto;
-  }
-
-  .positions-section h2 {
+  .positions-section h3 {
     font-family: var(--mono);
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.06em;
     color: var(--text-secondary);
-    margin-bottom: 12px;
+    margin-bottom: 8px;
   }
 
   .positions-table {
     width: 100%;
     border-collapse: collapse;
     font-family: var(--mono);
-    font-size: 13px;
-    min-width: 500px;
+    font-size: 12px;
   }
 
   .positions-table th {
     text-align: left;
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 600;
     letter-spacing: 0.06em;
     color: var(--text-muted);
-    padding: 6px 10px;
+    padding: 5px 8px;
     border-bottom: 1px solid var(--border);
     text-transform: uppercase;
   }
 
   .positions-table td {
-    padding: 8px 10px;
+    padding: 6px 8px;
     border-bottom: 1px solid rgba(30, 41, 59, 0.5);
     color: var(--text-primary);
   }
@@ -226,43 +263,31 @@
 
   .empty-state {
     text-align: center;
-    padding: 60px 20px;
+    padding: 28px 16px;
     color: var(--text-muted);
     font-family: var(--mono);
-    font-size: 14px;
+    font-size: 12px;
   }
 
   .empty-state .icon {
-    font-size: 32px;
-    margin-bottom: 12px;
+    font-size: 26px;
+    margin-bottom: 10px;
     opacity: 0.4;
   }
 
   .last-updated {
     text-align: center;
-    margin-top: 16px;
+    margin-top: 8px;
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 9px;
     color: var(--text-muted);
-  }
-
-  .error-banner {
-    background: rgba(248, 113, 113, 0.1);
-    border: 1px solid rgba(248, 113, 113, 0.3);
-    border-radius: 8px;
-    padding: 12px 16px;
-    margin-bottom: 16px;
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--red);
   }
 
   @media (max-width: 480px) {
     body { padding: 12px; }
     .header-stat .value { font-size: 16px; }
     .header-stats { gap: 16px; }
-    .metric-card .value { font-size: 15px; }
-    .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+    .panels { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -275,75 +300,83 @@
   </div>
   <div class="header-stats">
     <div class="header-stat">
-      <div class="label">EQUITY</div>
+      <div class="label">US EQUITY (USD)</div>
       <div class="value" id="total-equity">—</div>
     </div>
     <div class="header-stat">
-      <div class="label">TOTAL P&L</div>
+      <div class="label">US P&L (USD)</div>
       <div class="value" id="total-pnl">—</div>
     </div>
   </div>
 </div>
 
-<div class="model-banner">
-  <span class="dot"></span>
-  <span class="name">Model A</span>
-  <span class="subtitle">· Technical ML · Random Forest</span>
-  <span class="status-badge"><span class="pulse"></span>LIVE</span>
-</div>
-
-<div id="error-container"></div>
-
-<div class="chart-container">
-  <canvas id="equity-chart"></canvas>
-</div>
-
-<div class="metrics-grid" id="metrics-grid"></div>
-
-<div class="positions-section">
-  <h2>Open positions</h2>
-  <div id="positions-container">
-    <div class="empty-state">
-      <div class="icon">⏳</div>
-      Loading...
-    </div>
-  </div>
-</div>
-
-<div class="last-updated" id="last-updated"></div>
+<div id="sections"></div>
 
 <script>
 // ===================================================
-// CONFIG — update this to your repo
+// CONFIG
 // ===================================================
 const REPO_OWNER = "kareemhsalama";
 const REPO_NAME = "stock_predictor";
 const BRANCH = "main";
-const LEDGER_FILE = "data/model_a_ledger.json";
-const INITIAL_BUDGET = 100000;
 
-const LEDGER_URL = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}/${LEDGER_FILE}`;
+const USD = { code: "USD", symbol: "$", axisDiv: 1000, axisSuffix: "k" };
+const EGP = { code: "EGP", symbol: "EGP ", axisDiv: 1000, axisSuffix: "k" };
+
+// Each model gets its own isolated ledger. New models render automatically as
+// their ledger files come online — a missing/empty ledger shows a placeholder
+// instead of breaking the page.
+const SECTIONS = [
+  {
+    title: "US Markets",
+    currency: USD,
+    models: [
+      { key: "a-us", file: "data/model_a_ledger.json",
+        name: "Model A", subtitle: "· Technical ML · Random Forest", currency: USD },
+      { key: "d-us", file: "data/model_d_ledger.json",
+        name: "Model D", subtitle: "· Mean Reversion · Z-Score", currency: USD },
+    ],
+  },
+  {
+    title: "EGX (Egyptian Exchange)",
+    currency: EGP,
+    models: [
+      { key: "a-egx", file: "data/model_a_egx_ledger.json",
+        name: "Model A · EGX", subtitle: "· Technical ML · Random Forest", currency: EGP },
+    ],
+  },
+];
+
+const rawUrl = (file) =>
+  `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}/${file}`;
+
+// ===================================================
+// Formatting
+// ===================================================
+function fmtMoney(v, cur, opts = {}) {
+  const digits = opts.digits ?? 0;
+  return `${cur.symbol}${Math.abs(v).toLocaleString(undefined, { maximumFractionDigits: digits, minimumFractionDigits: digits })}`;
+}
+function fmtSigned(v, cur) {
+  return `${v >= 0 ? "+" : "-"}${fmtMoney(v, cur)}`;
+}
 
 // ===================================================
 // Metric computation
 // ===================================================
-function computeMetrics(snapshots) {
-  if (snapshots.length === 0) return null;
-
+function computeMetrics(snapshots, initialBudget) {
   const latest = snapshots[snapshots.length - 1];
   const equity = latest.equity;
-  const pnl = equity - INITIAL_BUDGET;
-  const totalReturn = (pnl / INITIAL_BUDGET) * 100;
+  const pnl = equity - initialBudget;
+  const totalReturn = (pnl / initialBudget) * 100;
 
-  // daily returns
   const dailyReturns = [];
   for (let i = 1; i < snapshots.length; i++) {
     const prev = snapshots[i - 1].equity;
     const curr = snapshots[i].equity;
-    dailyReturns.push((curr - prev) / prev);
+    if (prev > 0) dailyReturns.push((curr - prev) / prev);
   }
 
-  // sharpe ratio (annualized)
   let sharpe = 0;
   if (dailyReturns.length > 1) {
     const avg = dailyReturns.reduce((a, b) => a + b, 0) / dailyReturns.length;
@@ -351,223 +384,235 @@ function computeMetrics(snapshots) {
     sharpe = std > 0 ? (avg / std) * Math.sqrt(252) : 0;
   }
 
-  // win rate (days with positive return)
   const wins = dailyReturns.filter(r => r > 0).length;
   const losses = dailyReturns.filter(r => r <= 0).length;
   const winRate = dailyReturns.length > 0 ? wins / dailyReturns.length : 0;
 
-  // max drawdown
-  let maxEquity = 0;
-  let maxDrawdown = 0;
+  let maxEquity = 0, maxDrawdown = 0;
   for (const s of snapshots) {
     maxEquity = Math.max(maxEquity, s.equity);
-    const dd = (maxEquity - s.equity) / maxEquity;
-    maxDrawdown = Math.max(maxDrawdown, dd);
+    if (maxEquity > 0) maxDrawdown = Math.max(maxDrawdown, (maxEquity - s.equity) / maxEquity);
   }
 
   return {
-    equity,
-    pnl,
-    totalReturn,
-    sharpe,
-    winRate,
-    maxDrawdown,
-    tradingDays: snapshots.length,
-    wins,
-    losses,
-    latestDate: latest.date,
-    positions: latest.positions || [],
+    equity, pnl, totalReturn, sharpe, winRate, maxDrawdown,
+    tradingDays: snapshots.length, wins, losses,
+    latestDate: latest.date, positions: latest.positions || [], initialBudget,
   };
 }
 
 // ===================================================
 // Rendering
 // ===================================================
-function renderMetrics(m) {
-  document.getElementById("total-equity").textContent = `$${m.equity.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+function panelSkeleton(model) {
+  return `
+    <div class="model-panel" id="panel-${model.key}">
+      <div class="model-banner">
+        <span class="dot"></span>
+        <span class="name">${model.name}</span>
+        <span class="subtitle">${model.subtitle}</span>
+        <span class="status-badge offline" id="badge-${model.key}">…</span>
+      </div>
+      <div id="body-${model.key}">
+        <div class="empty-state"><div class="icon">⏳</div>Loading…</div>
+      </div>
+    </div>`;
+}
 
-  const pnlEl = document.getElementById("total-pnl");
-  pnlEl.textContent = `${m.pnl >= 0 ? "+" : "-"}$${Math.abs(m.pnl).toFixed(0)}`;
-  pnlEl.className = `value ${m.pnl >= 0 ? "up" : "down"}`;
-
+function renderMetricsHTML(m, cur) {
   const metrics = [
     { label: "Return", value: `${m.totalReturn >= 0 ? "+" : ""}${m.totalReturn.toFixed(2)}%`, good: m.totalReturn >= 0 },
-    { label: "Sharpe ratio", value: m.sharpe.toFixed(2), good: m.sharpe > 1 },
+    { label: "Sharpe", value: m.sharpe.toFixed(2), good: m.sharpe > 1 },
     { label: "Win rate", value: `${(m.winRate * 100).toFixed(1)}%`, good: m.winRate > 0.5 },
-    { label: "Max drawdown", value: `${(m.maxDrawdown * 100).toFixed(2)}%`, good: m.maxDrawdown < 0.1 },
-    { label: "Trading days", value: m.tradingDays, good: null },
+    { label: "Max DD", value: `${(m.maxDrawdown * 100).toFixed(2)}%`, good: m.maxDrawdown < 0.1 },
+    { label: "Days", value: m.tradingDays, good: null },
     { label: "W / L", value: `${m.wins} / ${m.losses}`, good: m.wins > m.losses },
   ];
-
-  const grid = document.getElementById("metrics-grid");
-  grid.innerHTML = metrics.map(met => `
+  return `<div class="metrics-grid">${metrics.map(met => `
     <div class="metric-card">
       <div class="label">${met.label}</div>
       <div class="value ${met.good === null ? "" : met.good ? "up" : "down"}">${met.value}</div>
-    </div>
-  `).join("");
+    </div>`).join("")}</div>`;
 }
 
-function renderPositions(positions) {
-  const container = document.getElementById("positions-container");
+function renderPositionsHTML(positions, cur) {
   if (!positions || positions.length === 0) {
-    container.innerHTML = `<div class="empty-state"><div class="icon">📭</div>No open positions</div>`;
-    return;
+    return `<div class="positions-section"><h3>Open positions</h3>
+      <div class="empty-state"><div class="icon">📭</div>No open positions</div></div>`;
   }
-
-  container.innerHTML = `
+  return `<div class="positions-section"><h3>Open positions</h3>
     <table class="positions-table">
-      <thead>
+      <thead><tr><th>Symbol</th><th>Qty</th><th>Avg entry</th><th>Current</th><th>P&L</th></tr></thead>
+      <tbody>${positions.map(p => `
         <tr>
-          <th>Symbol</th>
-          <th>Qty</th>
-          <th>Avg entry</th>
-          <th>Current</th>
-          <th>P&L</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${positions.map(p => `
-          <tr>
-            <td style="font-weight:700">${p.symbol}</td>
-            <td>${p.qty}</td>
-            <td>$${parseFloat(p.avg_entry).toFixed(2)}</td>
-            <td>$${parseFloat(p.current_price).toFixed(2)}</td>
-            <td class="${p.unrealized_pnl >= 0 ? "up" : "down"}">
-              ${p.unrealized_pnl >= 0 ? "+" : "-"}$${Math.abs(p.unrealized_pnl).toFixed(2)}
-            </td>
-          </tr>
-        `).join("")}
-      </tbody>
-    </table>
-  `;
+          <td style="font-weight:700">${p.symbol}</td>
+          <td>${p.qty}</td>
+          <td>${fmtMoney(parseFloat(p.avg_entry), cur, { digits: 2 })}</td>
+          <td>${fmtMoney(parseFloat(p.current_price), cur, { digits: 2 })}</td>
+          <td class="${p.unrealized_pnl >= 0 ? "up" : "down"}">${fmtSigned(parseFloat(p.unrealized_pnl), cur)}</td>
+        </tr>`).join("")}</tbody>
+    </table></div>`;
 }
 
-let chartInstance = null;
-
-function renderChart(snapshots) {
-  const ctx = document.getElementById("equity-chart").getContext("2d");
-
-  if (chartInstance) chartInstance.destroy();
-
+function renderChart(canvasId, snapshots, m, cur) {
+  const ctx = document.getElementById(canvasId).getContext("2d");
   const labels = snapshots.map(s => s.date);
   const data = snapshots.map(s => s.equity);
 
-  chartInstance = new Chart(ctx, {
+  const chart = new Chart(ctx, {
     type: "line",
     data: {
       labels,
       datasets: [{
-        label: "Equity",
-        data,
+        label: "Equity", data,
         borderColor: "#22d3ee",
         backgroundColor: "rgba(34, 211, 238, 0.08)",
-        fill: true,
-        tension: 0.3,
-        pointRadius: 0,
-        pointHitRadius: 10,
-        borderWidth: 2,
+        fill: true, tension: 0.3, pointRadius: 0, pointHitRadius: 10, borderWidth: 2,
       }],
     },
     options: {
-      responsive: true,
-      maintainAspectRatio: false,
+      responsive: true, maintainAspectRatio: false,
       interaction: { intersect: false, mode: "index" },
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor: "#0f172a",
-          borderColor: "#1e293b",
-          borderWidth: 1,
+          backgroundColor: "#0f172a", borderColor: "#1e293b", borderWidth: 1,
           titleFont: { family: "'JetBrains Mono', monospace", size: 11 },
           bodyFont: { family: "'JetBrains Mono', monospace", size: 13 },
           padding: 10,
-          callbacks: {
-            label: (ctx) => `$${ctx.parsed.y.toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
-          },
+          callbacks: { label: (c) => fmtMoney(c.parsed.y, cur, { digits: 2 }) },
         },
       },
       scales: {
         x: {
-          ticks: {
-            color: "#475569",
-            font: { family: "'JetBrains Mono', monospace", size: 10 },
-            maxTicksLimit: 8,
-          },
-          grid: { color: "rgba(30, 41, 59, 0.5)" },
-          border: { color: "#1e293b" },
+          ticks: { color: "#475569", font: { family: "'JetBrains Mono', monospace", size: 9 }, maxTicksLimit: 6 },
+          grid: { color: "rgba(30, 41, 59, 0.5)" }, border: { color: "#1e293b" },
         },
         y: {
           ticks: {
-            color: "#475569",
-            font: { family: "'JetBrains Mono', monospace", size: 10 },
-            callback: (v) => `$${(v / 1000).toFixed(1)}k`,
+            color: "#475569", font: { family: "'JetBrains Mono', monospace", size: 9 },
+            callback: (v) => `${cur.symbol}${(v / cur.axisDiv).toFixed(0)}${cur.axisSuffix}`,
           },
-          grid: { color: "rgba(30, 41, 59, 0.5)" },
-          border: { display: false },
+          grid: { color: "rgba(30, 41, 59, 0.5)" }, border: { display: false },
         },
       },
     },
+    plugins: [{
+      id: "baseline",
+      afterDraw(chartObj) {
+        const yScale = chartObj.scales.y;
+        const y = yScale.getPixelForValue(m.initialBudget);
+        const c = chartObj.ctx;
+        c.save();
+        c.setLineDash([4, 4]);
+        c.strokeStyle = "#334155";
+        c.lineWidth = 1;
+        c.beginPath();
+        c.moveTo(chartObj.chartArea.left, y);
+        c.lineTo(chartObj.chartArea.right, y);
+        c.stroke();
+        c.fillStyle = "#475569";
+        c.font = "9px 'JetBrains Mono', monospace";
+        const label = `${cur.symbol}${(m.initialBudget / cur.axisDiv).toFixed(0)}${cur.axisSuffix} initial`;
+        c.fillText(label, chartObj.chartArea.right - 84, y - 5);
+        c.restore();
+      },
+    }],
   });
-
-  // baseline reference line
-  const baselinePlugin = {
-    id: "baseline",
-    afterDraw(chart) {
-      const yScale = chart.scales.y;
-      const y = yScale.getPixelForValue(INITIAL_BUDGET);
-      const ctx = chart.ctx;
-      ctx.save();
-      ctx.setLineDash([4, 4]);
-      ctx.strokeStyle = "#334155";
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(chart.chartArea.left, y);
-      ctx.lineTo(chart.chartArea.right, y);
-      ctx.stroke();
-      ctx.fillStyle = "#475569";
-      ctx.font = "10px 'JetBrains Mono', monospace";
-      ctx.fillText("$25k initial", chart.chartArea.right - 70, y - 6);
-      ctx.restore();
-    },
-  };
-
-  chartInstance.config.plugins = [baselinePlugin];
-  chartInstance.update();
+  return chart;
 }
 
-function showError(msg) {
-  document.getElementById("error-container").innerHTML =
-    `<div class="error-banner">${msg}</div>`;
+function renderPanel(model, ledger) {
+  const snapshots = ledger.snapshots || [];
+  const badge = document.getElementById(`badge-${model.key}`);
+  const body = document.getElementById(`body-${model.key}`);
+
+  if (snapshots.length === 0) {
+    badge.className = "status-badge offline";
+    badge.textContent = "NO DATA";
+    body.innerHTML = `<div class="empty-state"><div class="icon">📡</div>No snapshots yet — run the workflow to seed data</div>`;
+    return null;
+  }
+
+  const initialBudget = ledger.initial_budget ?? snapshots[0].equity;
+  const m = computeMetrics(snapshots, initialBudget);
+
+  badge.className = "status-badge";
+  badge.innerHTML = `<span class="pulse"></span>LIVE`;
+
+  body.innerHTML = `
+    <div class="chart-wrap"><canvas id="chart-${model.key}"></canvas></div>
+    ${renderMetricsHTML(m, model.currency)}
+    ${renderPositionsHTML(m.positions, model.currency)}
+    <div class="last-updated">Last snapshot: ${m.latestDate}</div>`;
+
+  renderChart(`chart-${model.key}`, snapshots, m, model.currency);
+  return m;
+}
+
+function markOffline(model, reason) {
+  const badge = document.getElementById(`badge-${model.key}`);
+  const body = document.getElementById(`body-${model.key}`);
+  badge.className = "status-badge offline";
+  badge.textContent = "OFFLINE";
+  body.innerHTML = `<div class="empty-state"><div class="icon">🚧</div>Not live yet</div>`;
 }
 
 // ===================================================
 // Init
 // ===================================================
 async function init() {
-  try {
-    const resp = await fetch(LEDGER_URL);
-    if (!resp.ok) throw new Error(`Failed to fetch ledger (${resp.status})`);
+  const sectionsEl = document.getElementById("sections");
 
-    const ledger = await resp.json();
-    const snapshots = ledger.snapshots || [];
+  // Build the DOM skeleton first so panels appear immediately.
+  sectionsEl.innerHTML = SECTIONS.map(sec => `
+    <div class="market-section">
+      <div class="section-title">
+        <span class="name">${sec.title}</span>
+        <span class="agg" id="agg-${sec.title.replace(/\W+/g, "")}"></span>
+      </div>
+      <div class="panels">${sec.models.map(panelSkeleton).join("")}</div>
+    </div>`).join("");
 
-    if (snapshots.length === 0) {
-      document.getElementById("positions-container").innerHTML =
-        `<div class="empty-state"><div class="icon">📡</div>No snapshots yet — run the action manually to seed data</div>`;
-      return;
+  let usEquity = 0, usPnl = 0, haveUsData = false;
+
+  for (const sec of SECTIONS) {
+    let secEquity = 0, secPnl = 0, secHasData = false;
+
+    for (const model of sec.models) {
+      try {
+        const resp = await fetch(rawUrl(model.file), { cache: "no-store" });
+        if (!resp.ok) { markOffline(model); continue; }
+        const ledger = await resp.json();
+        const m = renderPanel(model, ledger);
+        if (m) {
+          secEquity += m.equity;
+          secPnl += m.pnl;
+          secHasData = true;
+        }
+      } catch (err) {
+        console.error(model.key, err);
+        markOffline(model);
+      }
     }
 
-    const m = computeMetrics(snapshots);
-    renderChart(snapshots);
-    renderMetrics(m);
-    renderPositions(m.positions);
+    // Section aggregate (single currency per section, so summing is safe).
+    const aggEl = document.getElementById(`agg-${sec.title.replace(/\W+/g, "")}`);
+    if (aggEl && secHasData) {
+      aggEl.innerHTML = `${fmtMoney(secEquity, sec.currency)} equity · ` +
+        `<span class="${secPnl >= 0 ? "up" : "down"}">${fmtSigned(secPnl, sec.currency)}</span>`;
+    }
 
-    document.getElementById("last-updated").textContent =
-      `Last snapshot: ${m.latestDate}`;
-  } catch (err) {
-    console.error(err);
-    showError(`Could not load ledger — make sure the repo and file path are correct. (${err.message})`);
+    if (sec.currency.code === "USD" && secHasData) {
+      usEquity += secEquity; usPnl += secPnl; haveUsData = true;
+    }
+  }
+
+  if (haveUsData) {
+    document.getElementById("total-equity").textContent = fmtMoney(usEquity, USD);
+    const pnlEl = document.getElementById("total-pnl");
+    pnlEl.textContent = fmtSigned(usPnl, USD);
+    pnlEl.className = `value ${usPnl >= 0 ? "up" : "down"}`;
   }
 }
 
