@@ -495,6 +495,23 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-07-16",
+      "equity": 99841.18,
+      "cash": 91280.38,
+      "pnl": -158.82000000000698,
+      "positions": [
+        {
+          "symbol": "GOOGL",
+          "qty": 24.0,
+          "avg_entry": 371.988333,
+          "current_price": 356.7,
+          "market_value": 8560.8,
+          "unrealized_pnl": -366.919992,
+          "side": "long"
+        }
+      ]
     }
   ]
 }
