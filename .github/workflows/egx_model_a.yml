@@ -1,0 +1,37 @@
+name: EGX Model A (Random Forest)
+
+on:
+  schedule:
+    # 12:30 UTC = 14:30 EET (Cairo), ~15 min after the 14:15 EET EGX close.
+    # Sun-Thu are the EGX trading days (cron day-of-week: Sun=0 .. Thu=4).
+    - cron: "30 12 * * 0-4"
+  workflow_dispatch: # manual trigger for testing
+
+jobs:
+  egx-trade:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install yfinance pandas numpy scikit-learn
+
+      - name: Trade + snapshot EGX Model A
+        run: python egx_random_forest.py
+
+      - name: Commit ledger update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/model_a_egx_ledger.json
+          git diff --cached --quiet || git commit -m "EGX Model A $(date -u +%Y-%m-%d)"
+          git push

@@ -1,0 +1,43 @@
+{
+  "model": "A",
+  "name": "Technical ML - Random Forest (EGX)",
+  "market": "EGX",
+  "currency": "EGP",
+  "initial_budget": 1000000.0,
+  "cash": 900088.0,
+  "positions": {
+    "SWDY.CA": {
+      "qty": 1104,
+      "avg_price": 90.5
+    }
+  },
+  "trade_log": [
+    {
+      "timestamp": "2026-07-16T16:33:04.658395+00:00",
+      "side": "BUY",
+      "symbol": "SWDY.CA",
+      "qty": 1104,
+      "price": 90.5,
+      "cost": 99912.0
+    }
+  ],
+  "snapshots": [
+    {
+      "date": "2026-07-16",
+      "equity": 1000000.0,
+      "cash": 900088.0,
+      "pnl": 0.0,
+      "positions": [
+        {
+          "symbol": "SWDY.CA",
+          "qty": 1104.0,
+          "avg_entry": 90.5,
+          "current_price": 90.5,
+          "market_value": 99912.0,
+          "unrealized_pnl": 0.0,
+          "side": "long"
+        }
+      ]
+    }
+  ]
+}

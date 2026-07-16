@@ -1,0 +1,28 @@
+name: Daily Trade - Model D (Mean Reversion)
+
+on:
+  schedule:
+    # 14:05 UTC — offset from Model A's 13:45 slot so they don't race a runner.
+    - cron: "5 14 * * 1-5"
+  workflow_dispatch:
+
+jobs:
+  trade:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Model D trading script
+        env:
+          # Model D's own paper account (see live_trader_meanreversion.py).
+          ALPACA_API_KEY_D: ${{ secrets.ALPACA_API_KEY_D }}
+          ALPACA_SECRET_KEY_D: ${{ secrets.ALPACA_SECRET_KEY_D }}
+        run: python live_trader_meanreversion.py

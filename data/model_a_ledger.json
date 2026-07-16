@@ -1,13 +1,13 @@
 {
   "model": "A",
   "name": "Technical ML - Random Forest",
-  "initial_budget": 25000,
+  "initial_budget": 100000,
   "snapshots": [
     {
       "date": "2026-06-19",
       "equity": 99872.04,
       "cash": 91655.13,
-      "pnl": 74872.04,
+      "pnl": -127.96,
       "positions": [
         {
           "symbol": "NVDA",
@@ -16,6 +16,23 @@
           "current_price": 210.69,
           "market_value": 8216.91,
           "unrealized_pnl": 131.500005,
+          "side": "long"
+        }
+      ]
+    },
+    {
+      "date": "2026-07-16",
+      "equity": 100183.78,
+      "cash": 91280.38,
+      "pnl": 183.78,
+      "positions": [
+        {
+          "symbol": "GOOGL",
+          "qty": 24.0,
+          "avg_entry": 371.988333,
+          "current_price": 370.94,
+          "market_value": 8902.56,
+          "unrealized_pnl": -25.159992,
           "side": "long"
         }
       ]
