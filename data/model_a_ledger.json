@@ -625,6 +625,23 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-07-23",
+      "equity": 98361.59,
+      "cash": 90900.39,
+      "pnl": -1638.4100000000035,
+      "positions": [
+        {
+          "symbol": "TSLA",
+          "qty": 23.0,
+          "avg_entry": 380.03913,
+          "current_price": 324.4,
+          "market_value": 7461.2,
+          "unrealized_pnl": -1279.69999,
+          "side": "long"
+        }
+      ]
     }
   ]
 }
