@@ -4,11 +4,11 @@
   "market": "EGX",
   "currency": "EGP",
   "initial_budget": 1000000.0,
-  "cash": 901513.5781402588,
+  "cash": 910687.0781402588,
   "positions": {
-    "TMGH.CA": {
-      "qty": 987,
-      "avg_price": 101.44999694824219
+    "COMI.CA": {
+      "qty": 643,
+      "avg_price": 140.0
     }
   },
   "trade_log": [
@@ -53,6 +53,23 @@
       "qty": 987,
       "price": 101.44999694824219,
       "cost": 100131.14698791504
+    },
+    {
+      "timestamp": "2026-07-23T14:40:47.350473+00:00",
+      "side": "BUY",
+      "symbol": "COMI.CA",
+      "qty": 643,
+      "price": 140.0,
+      "cost": 90020.0
+    },
+    {
+      "timestamp": "2026-07-23T14:40:47.757761+00:00",
+      "side": "SELL",
+      "symbol": "TMGH.CA",
+      "qty": 987,
+      "price": 100.5,
+      "proceeds": 99193.5,
+      "pnl": -937.6469879150391
     }
   ],
   "snapshots": [
@@ -126,6 +143,23 @@
           "avg_entry": 101.45,
           "current_price": 101.45,
           "market_value": 100131.15,
+          "unrealized_pnl": 0.0,
+          "side": "long"
+        }
+      ]
+    },
+    {
+      "date": "2026-07-23",
+      "equity": 1000707.08,
+      "cash": 910687.08,
+      "pnl": 707.08,
+      "positions": [
+        {
+          "symbol": "COMI.CA",
+          "qty": 643.0,
+          "avg_entry": 140.0,
+          "current_price": 140.0,
+          "market_value": 90020.0,
           "unrealized_pnl": 0.0,
           "side": "long"
         }
