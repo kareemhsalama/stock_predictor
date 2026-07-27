@@ -60,7 +60,8 @@ def load_state() -> dict:
     if os.path.exists(STATE_PATH):
         with open(STATE_PATH) as f:
             return json.load(f)
-    return {"peak_equity": None, "breaker_on": False, "positions": {}}
+    return {"peak_equity": None, "breaker_on": False, "bootstrapped": False,
+            "positions": {}}
 
 
 def save_state(state: dict):
@@ -280,7 +281,27 @@ def main():
         return
 
     state = load_state()
-    state = check_stops(state, cfg) if mode == "stops" else rebalance(state, cfg)
+
+    # Bootstrap: the weekly rebalance only fires on Mondays, so a model deployed
+    # on any other day would sit in cash for up to a week while the daily stop
+    # job checked an empty book. On the first run ever, rebalance immediately.
+    #
+    # One-shot, driven by an explicit flag rather than "is the book empty?" —
+    # an empty book is the CORRECT state in RISK_OFF or after the drawdown
+    # breaker trips, and re-bootstrapping daily would fight those controls.
+    if mode == "stops" and not state.get("bootstrapped"):
+        print("First run: book has never been rebalanced - bootstrapping now "
+              "rather than waiting for the Monday slot.")
+        mode = "rebalance"
+
+    if mode == "stops":
+        state = check_stops(state, cfg)
+    else:
+        state = rebalance(state, cfg)
+        # Set even if the rebalance produced no positions (e.g. RISK_OFF):
+        # the model has now had its first look, so the weekly cadence takes over.
+        state["bootstrapped"] = True
+
     save_state(state)
 
     account = client.get_account()

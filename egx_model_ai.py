@@ -136,9 +136,19 @@ def run():
 
     apply_stops(trader, data, prices, cfg)
 
+    # Bootstrap on the first run ever: waiting for the weekly Sunday slot would
+    # leave a freshly deployed model in cash for up to six days. One-shot flag
+    # rather than "is the book empty?" — empty is the correct state in RISK_OFF,
+    # and re-bootstrapping daily would override the regime gate.
     weekday = datetime.now(timezone.utc).weekday()
-    if weekday == REBALANCE_WEEKDAY:
+    first_run = not trader.extra.get("bootstrapped")
+
+    if first_run:
+        print(f"\nFirst run: bootstrapping the book rather than waiting for "
+              f"weekday {REBALANCE_WEEKDAY}.")
+    if first_run or weekday == REBALANCE_WEEKDAY:
         rebalance(trader, data, prices, cfg)
+        trader.extra["bootstrapped"] = True
     else:
         print(f"\nNot rebalance day (weekday {weekday}, "
               f"rebalance on {REBALANCE_WEEKDAY}) - stops only")
