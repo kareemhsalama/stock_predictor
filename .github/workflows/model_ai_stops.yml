@@ -1,0 +1,41 @@
+name: MODEL_AI US - Daily Stop Check
+
+on:
+  schedule:
+    # Every weekday at 16:00 UTC = 12:00 ET (EDT) / 11:00 ET (EST) — mid-session
+    # under both offsets, so a triggered stop actually fills the same day.
+    # Layer 4 stops are checked DAILY, independently of the weekly rebalance.
+    - cron: "0 16 * * 1-5"
+  workflow_dispatch:
+
+jobs:
+  stops:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Check stops and drawdown breaker
+        env:
+          ALPACA_API_KEY_AI: ${{ secrets.ALPACA_API_KEY_AI }}
+          ALPACA_SECRET_KEY_AI: ${{ secrets.ALPACA_SECRET_KEY_AI }}
+        run: python live_trader_ai.py stops
+
+      - name: Commit risk state
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/model_ai_state.json
+          git diff --cached --quiet || git commit -m "MODEL_AI stop check $(date -u +%Y-%m-%d)"
+          git pull --rebase --autostash
+          git push

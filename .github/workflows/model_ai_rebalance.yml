@@ -1,0 +1,42 @@
+name: MODEL_AI US - Weekly Rebalance
+
+on:
+  schedule:
+    # Mondays 14:50 UTC. Must sit inside US market hours under BOTH offsets
+    # (14:30-20:00 UTC in winter/EST, 13:30-20:00 in summer/EDT):
+    # 14:50 UTC = 10:50 ET (EDT) / 9:50 ET (EST). Offset from Model A (14:45)
+    # and Model D (15:05) so the three don't race a runner.
+    - cron: "50 14 * * 1"
+  workflow_dispatch:
+
+jobs:
+  rebalance:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Rebalance to MODEL_AI target weights
+        env:
+          ALPACA_API_KEY_AI: ${{ secrets.ALPACA_API_KEY_AI }}
+          ALPACA_SECRET_KEY_AI: ${{ secrets.ALPACA_SECRET_KEY_AI }}
+        run: python live_trader_ai.py rebalance
+
+      - name: Commit risk state
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/model_ai_state.json
+          git diff --cached --quiet || git commit -m "MODEL_AI rebalance state $(date -u +%Y-%m-%d)"
+          git pull --rebase --autostash
+          git push

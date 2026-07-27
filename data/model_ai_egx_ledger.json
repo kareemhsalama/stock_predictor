@@ -1,0 +1,12 @@
+{
+  "model": "AI",
+  "name": "Regime-Aware Momentum + Vol Target (EGX)",
+  "market": "EGX",
+  "currency": "EGP",
+  "initial_budget": 1000000.0,
+  "cash": 1000000.0,
+  "positions": {},
+  "trade_log": [],
+  "snapshots": [],
+  "extra": {}
+}

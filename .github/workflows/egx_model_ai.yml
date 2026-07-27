@@ -1,14 +1,16 @@
-name: EGX Model A (Random Forest)
+name: MODEL_AI EGX (Regime Momentum)
 
 on:
   schedule:
-    # 12:30 UTC = 14:30 EET (Cairo), ~15 min after the 14:15 EET EGX close.
+    # 12:35 UTC, ~20 min after the 14:15 EET EGX close (and after EGX Model A's
+    # 12:30 slot). Egypt observes DST, so this lands 14:35 Cairo in winter /
+    # 15:35 in summer — post-close either way, which is all this job needs.
     # Sun-Thu are the EGX trading days (cron day-of-week: Sun=0 .. Thu=4).
-    - cron: "30 12 * * 0-4"
-  workflow_dispatch: # manual trigger for testing
+    - cron: "35 12 * * 0-4"
+  workflow_dispatch:
 
 jobs:
-  egx-trade:
+  egx-model-ai:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -23,16 +25,16 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: pip install yfinance pandas numpy scikit-learn
+        run: pip install -r requirements.txt
 
-      - name: Trade + snapshot EGX Model A
-        run: python egx_random_forest.py
+      - name: Trade + snapshot MODEL_AI on EGX
+        run: python egx_model_ai.py
 
       - name: Commit ledger update
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/model_a_egx_ledger.json
-          git diff --cached --quiet || git commit -m "EGX Model A $(date -u +%Y-%m-%d)"
+          git add data/model_ai_egx_ledger.json
+          git diff --cached --quiet || git commit -m "MODEL_AI EGX $(date -u +%Y-%m-%d)"
           git pull --rebase --autostash
           git push

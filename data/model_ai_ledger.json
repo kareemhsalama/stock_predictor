@@ -1,0 +1,6 @@
+{
+  "model": "AI",
+  "name": "Regime-Aware Momentum + Vol Target",
+  "initial_budget": 100000.0,
+  "snapshots": []
+}

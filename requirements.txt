@@ -1,5 +1,7 @@
 yfinance
 pandas
+numpy
 scikit-learn
 alpaca-py
 python-dotenv
+requests

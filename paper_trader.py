@@ -119,6 +119,9 @@ class PaperTrader:
         self.positions: dict[str, dict] = {}   # symbol -> {"qty", "avg_price"}
         self.trade_log: list[dict] = []
         self.snapshots: list[dict] = []
+        # Free-form per-strategy state that must survive a fresh CI checkout
+        # (e.g. MODEL_AI's ATR high-water marks). Persisted with the ledger.
+        self.extra: dict = {}
 
         if os.path.exists(self.ledger_path):
             self._load_state()
@@ -250,6 +253,7 @@ class PaperTrader:
             "positions": self.positions,
             "trade_log": self.trade_log,
             "snapshots": self.snapshots,
+            "extra": self.extra,
         }
         directory = os.path.dirname(self.ledger_path)
         if directory:
@@ -266,5 +270,6 @@ class PaperTrader:
         self.positions = state.get("positions", {})
         self.trade_log = state.get("trade_log", [])
         self.snapshots = state.get("snapshots", [])
+        self.extra = state.get("extra", {})
         print(f"Loaded {self.ledger_path}: {self.cash:,.2f} "
               f"{self.market.currency} cash, {len(self.positions)} positions")
