@@ -169,6 +169,29 @@
     color: var(--text-muted);
   }
 
+  /* Live, but holding cash — distinct from both LIVE and OFFLINE. */
+  .status-badge.flat {
+    background: rgba(251, 191, 36, 0.12);
+    border-color: rgba(251, 191, 36, 0.4);
+    color: var(--amber);
+  }
+
+  .flat-note {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    background: rgba(251, 191, 36, 0.06);
+    border: 1px solid rgba(251, 191, 36, 0.25);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+  }
+
+  .flat-note .icon { color: var(--amber); }
+
   .status-badge .pulse {
     width: 5px;
     height: 5px;
@@ -522,6 +545,14 @@ function renderChart(canvasId, snapshots, m, cur) {
   return chart;
 }
 
+// A model that has never opened a position sits at exactly its initial equity
+// forever: flat line, +0.00%, 0 / 0 W-L, no positions. That is indistinguishable
+// from a broken panel, so call it out as idle-by-design instead of "LIVE".
+function hasTraded(snapshots, initialBudget) {
+  return snapshots.some(s =>
+    (s.positions || []).length > 0 || Math.abs(s.equity - initialBudget) > 0.005);
+}
+
 function renderPanel(model, ledger) {
   const snapshots = ledger.snapshots || [];
   const badge = document.getElementById(`badge-${model.key}`);
@@ -536,11 +567,26 @@ function renderPanel(model, ledger) {
 
   const initialBudget = ledger.initial_budget ?? snapshots[0].equity;
   const m = computeMetrics(snapshots, initialBudget);
+  const traded = hasTraded(snapshots, initialBudget);
 
-  badge.className = "status-badge";
-  badge.innerHTML = `<span class="pulse"></span>LIVE`;
+  if (traded) {
+    badge.className = "status-badge";
+    badge.innerHTML = `<span class="pulse"></span>LIVE`;
+  } else {
+    badge.className = "status-badge flat";
+    badge.textContent = "NO SIGNAL";
+  }
+
+  const flatNote = traded ? "" : `
+    <div class="flat-note">
+      <span class="icon">⏸</span>
+      <span>Holding cash — the entry signal has not triggered since ${snapshots[0].date}.
+      The model is running (${snapshots.length} snapshot${snapshots.length === 1 ? "" : "s"}
+      through ${m.latestDate}); it just has not found a setup yet.</span>
+    </div>`;
 
   body.innerHTML = `
+    ${flatNote}
     <div class="chart-wrap"><canvas id="chart-${model.key}"></canvas></div>
     ${renderMetricsHTML(m, model.currency)}
     ${renderPositionsHTML(m.positions, model.currency)}

@@ -36,8 +36,21 @@ secret_key = os.getenv("ALPACA_SECRET_KEY_D") or os.getenv("ALPACA_SECRET_KEY")
 
 client = TradingClient(api_key, secret_key, paper=True)
 
-# Mean-reversion universe (from WIP/mean_reversion.py).
-TICKERS = ["AAPL", "JPM", "KO", "NVDA", "XOM"]
+# Mean-reversion universe. Widened from the backtest's original 5 names
+# (AAPL/JPM/KO/NVDA/XOM) because that universe only produced ~4 entries per
+# ticker per year at ENTRY_Z=2.0 — over a 3y sweep, 63 entries total, which
+# left the model sitting in cash for weeks at a stretch and made the dashboard
+# panel look dead. Twelve liquid large caps across sectors give ~160 entries
+# over the same 3y window at the SAME threshold; loosening ENTRY_Z to 1.5
+# instead would have bought activity at the cost of in-trade Sharpe
+# (2.50 -> 1.87), so the universe is what changed, not the signal.
+TICKERS = [
+    "AAPL", "MSFT", "NVDA",   # tech
+    "JPM", "BAC",             # financials
+    "KO", "PG", "JNJ", "WMT", # staples / healthcare
+    "XOM", "CVX",             # energy
+    "HD",                     # discretionary
+]
 
 # Signal params — same thresholds as the backtest.
 WINDOW = 20

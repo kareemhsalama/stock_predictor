@@ -2,7 +2,12 @@ name: Daily Trade
 
 on:
   schedule:
-    - cron: '45 13 * * 1-5'
+    # Actions cron is always UTC, so the slot has to sit inside US market hours
+    # under BOTH offsets: 14:30-20:00 UTC in winter (EST), 13:30-20:00 in summer
+    # (EDT). 14:45 UTC = 10:45 ET (EDT) / 9:45 ET (EST) — open year-round.
+    # The old 13:45 UTC ran 45 min BEFORE the winter open and silently no-oped
+    # on the clock.is_open guard every day from November to March.
+    - cron: '45 14 * * 1-5'
   workflow_dispatch:
 
 jobs:

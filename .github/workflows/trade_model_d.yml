@@ -2,8 +2,12 @@ name: Daily Trade - Model D (Mean Reversion)
 
 on:
   schedule:
-    # 14:05 UTC — offset from Model A's 13:45 slot so they don't race a runner.
-    - cron: "5 14 * * 1-5"
+    # 15:05 UTC — offset from Model A's 14:45 slot so they don't race a runner.
+    # Must stay inside US market hours under both offsets (14:30-20:00 UTC in
+    # winter/EST, 13:30-20:00 in summer/EDT): 15:05 UTC = 11:05 ET (EDT) /
+    # 10:05 ET (EST). The old 14:05 UTC was 9:05 ET in winter — before the open,
+    # so the clock.is_open guard skipped every run from November to March.
+    - cron: "5 15 * * 1-5"
   workflow_dispatch:
 
 jobs:
