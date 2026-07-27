@@ -2,5 +2,13 @@
   "model": "AI",
   "name": "Regime-Aware Momentum + Vol Target",
   "initial_budget": 100000.0,
-  "snapshots": []
+  "snapshots": [
+    {
+      "date": "2026-07-27",
+      "equity": 100000.0,
+      "cash": 100000.0,
+      "pnl": 0.0,
+      "positions": []
+    }
+  ]
 }
