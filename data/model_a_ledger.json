@@ -676,6 +676,23 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-07-28",
+      "equity": 97843.2,
+      "cash": 88778.9,
+      "pnl": -2156.800000000003,
+      "positions": [
+        {
+          "symbol": "MSFT",
+          "qty": 23.0,
+          "avg_entry": 398.44,
+          "current_price": 394.1,
+          "market_value": 9064.3,
+          "unrealized_pnl": -99.82,
+          "side": "long"
+        }
+      ]
     }
   ]
 }
