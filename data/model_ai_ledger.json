@@ -9,6 +9,86 @@
       "cash": 100000.0,
       "pnl": 0.0,
       "positions": []
+    },
+    {
+      "date": "2026-07-28",
+      "equity": 99760.38,
+      "cash": 17680.41,
+      "pnl": -239.61999999999534,
+      "positions": [
+        {
+          "symbol": "ABBV",
+          "qty": 43.0,
+          "avg_entry": 264.85,
+          "current_price": 263.2,
+          "market_value": 11317.6,
+          "unrealized_pnl": -70.95,
+          "side": "long"
+        },
+        {
+          "symbol": "AMD",
+          "qty": 9.0,
+          "avg_entry": 459.097778,
+          "current_price": 447.88,
+          "market_value": 4030.92,
+          "unrealized_pnl": -100.960002,
+          "side": "long"
+        },
+        {
+          "symbol": "CSCO",
+          "qty": 83.0,
+          "avg_entry": 116.113373,
+          "current_price": 116.14,
+          "market_value": 9639.62,
+          "unrealized_pnl": 2.210041,
+          "side": "long"
+        },
+        {
+          "symbol": "GE",
+          "qty": 32.0,
+          "avg_entry": 362.59,
+          "current_price": 363.59,
+          "market_value": 11634.88,
+          "unrealized_pnl": 32.0,
+          "side": "long"
+        },
+        {
+          "symbol": "JNJ",
+          "qty": 44.0,
+          "avg_entry": 267.2,
+          "current_price": 267.2,
+          "market_value": 11756.8,
+          "unrealized_pnl": 0.0,
+          "side": "long"
+        },
+        {
+          "symbol": "LLY",
+          "qty": 9.0,
+          "avg_entry": 1220.77,
+          "current_price": 1222.49,
+          "market_value": 11002.41,
+          "unrealized_pnl": 15.48,
+          "side": "long"
+        },
+        {
+          "symbol": "MRK",
+          "qty": 82.0,
+          "avg_entry": 131.53,
+          "current_price": 131.3451,
+          "market_value": 10770.2982,
+          "unrealized_pnl": -15.1618,
+          "side": "long"
+        },
+        {
+          "symbol": "UNH",
+          "qty": 28.0,
+          "avg_entry": 429.631429,
+          "current_price": 425.98,
+          "market_value": 11927.44,
+          "unrealized_pnl": -102.240012,
+          "side": "long"
+        }
+      ]
     }
   ]
 }
