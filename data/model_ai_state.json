@@ -2,5 +2,38 @@
   "peak_equity": 100000.0,
   "breaker_on": false,
   "bootstrapped": true,
-  "positions": {}
+  "positions": {
+    "ABBV": {
+      "entry_date": "2026-07-30",
+      "peak_price": 258.865
+    },
+    "AMD": {
+      "entry_date": "2026-07-30",
+      "peak_price": 487.41
+    },
+    "CSCO": {
+      "entry_date": "2026-07-30",
+      "peak_price": 113.72
+    },
+    "GE": {
+      "entry_date": "2026-07-30",
+      "peak_price": 354.235
+    },
+    "JNJ": {
+      "entry_date": "2026-07-30",
+      "peak_price": 255.73
+    },
+    "LLY": {
+      "entry_date": "2026-07-30",
+      "peak_price": 1161.8
+    },
+    "MRK": {
+      "entry_date": "2026-07-30",
+      "peak_price": 129.36
+    },
+    "UNH": {
+      "entry_date": "2026-07-30",
+      "peak_price": 425.47
+    }
+  }
 }
