@@ -72,6 +72,23 @@
       "cash": 100000.0,
       "pnl": 0.0,
       "positions": []
+    },
+    {
+      "date": "2026-07-30",
+      "equity": 100021.08,
+      "cash": 95125.08,
+      "pnl": 21.080000000001746,
+      "positions": [
+        {
+          "symbol": "PG",
+          "qty": 34.0,
+          "avg_entry": 143.38,
+          "current_price": 144.0,
+          "market_value": 4896.0,
+          "unrealized_pnl": 21.08,
+          "side": "long"
+        }
+      ]
     }
   ]
 }
