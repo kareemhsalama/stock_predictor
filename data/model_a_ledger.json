@@ -807,6 +807,50 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-08-03",
+      "equity": 101188.97,
+      "cash": 70118.82,
+      "pnl": 1188.9700000000012,
+      "positions": [
+        {
+          "symbol": "AAPL",
+          "qty": 22.0,
+          "avg_entry": 306.5,
+          "current_price": 303.7,
+          "market_value": 6681.4,
+          "unrealized_pnl": -61.6,
+          "side": "long"
+        },
+        {
+          "symbol": "GOOGL",
+          "qty": 23.0,
+          "avg_entry": 334.7,
+          "current_price": 371.83,
+          "market_value": 8552.09,
+          "unrealized_pnl": 853.99,
+          "side": "long"
+        },
+        {
+          "symbol": "NVDA",
+          "qty": 36.0,
+          "avg_entry": 191.369167,
+          "current_price": 206.81,
+          "market_value": 7445.16,
+          "unrealized_pnl": 555.869988,
+          "side": "long"
+        },
+        {
+          "symbol": "TSLA",
+          "qty": 26.0,
+          "avg_entry": 308.09,
+          "current_price": 322.75,
+          "market_value": 8391.5,
+          "unrealized_pnl": 381.16,
+          "side": "long"
+        }
+      ]
     }
   ]
 }
