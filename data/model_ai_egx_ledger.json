@@ -396,13 +396,57 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-08-05",
+      "equity": 1029276.6,
+      "cash": 319193.59,
+      "pnl": 29276.6,
+      "positions": [
+        {
+          "symbol": "SWDY.CA",
+          "qty": 1813.0,
+          "avg_entry": 95.9,
+          "current_price": 109.02,
+          "market_value": 197653.25,
+          "unrealized_pnl": 23786.55,
+          "side": "long"
+        },
+        {
+          "symbol": "PHDC.CA",
+          "qty": 11498.0,
+          "avg_entry": 14.6956,
+          "current_price": 15.28,
+          "market_value": 175689.44,
+          "unrealized_pnl": 6719.15,
+          "side": "long"
+        },
+        {
+          "symbol": "TMGH.CA",
+          "qty": 1713.0,
+          "avg_entry": 99.3836,
+          "current_price": 99.9,
+          "market_value": 171128.7,
+          "unrealized_pnl": 884.59,
+          "side": "long"
+        },
+        {
+          "symbol": "COMI.CA",
+          "qty": 1181.0,
+          "avg_entry": 140.2007,
+          "current_price": 140.23,
+          "market_value": 165611.62,
+          "unrealized_pnl": 34.62,
+          "side": "long"
+        }
+      ]
     }
   ],
   "extra": {
     "peak_price": {
-      "SWDY.CA": 95.4800033569336,
-      "PHDC.CA": 14.609999656677246,
-      "TMGH.CA": 99.8499984741211,
+      "SWDY.CA": 109.0199966430664,
+      "PHDC.CA": 15.279999732971191,
+      "TMGH.CA": 99.9000015258789,
       "COMI.CA": 141.5
     },
     "bootstrapped": true
