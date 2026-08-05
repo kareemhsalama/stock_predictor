@@ -4,8 +4,13 @@
   "market": "EGX",
   "currency": "EGP",
   "initial_budget": 1000000.0,
-  "cash": 1000707.0781402588,
-  "positions": {},
+  "cash": 900723.0911865234,
+  "positions": {
+    "COMI.CA": {
+      "qty": 713,
+      "avg_price": 140.22999572753906
+    }
+  },
   "trade_log": [
     {
       "timestamp": "2026-07-16T16:33:04.658395+00:00",
@@ -74,6 +79,14 @@
       "price": 140.0,
       "proceeds": 90020.0,
       "pnl": 0.0
+    },
+    {
+      "timestamp": "2026-08-05T14:54:04.493412+00:00",
+      "side": "BUY",
+      "symbol": "COMI.CA",
+      "qty": 713,
+      "price": 140.22999572753906,
+      "cost": 99983.98695373535
     }
   ],
   "snapshots": [
@@ -244,6 +257,23 @@
       "cash": 1000707.08,
       "pnl": 707.08,
       "positions": []
+    },
+    {
+      "date": "2026-08-05",
+      "equity": 1000707.08,
+      "cash": 900723.09,
+      "pnl": 707.08,
+      "positions": [
+        {
+          "symbol": "COMI.CA",
+          "qty": 713.0,
+          "avg_entry": 140.23,
+          "current_price": 140.23,
+          "market_value": 99983.99,
+          "unrealized_pnl": 0.0,
+          "side": "long"
+        }
+      ]
     }
   ],
   "extra": {}
