@@ -542,6 +542,77 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-08-07",
+      "equity": 97811.0,
+      "cash": 28693.61,
+      "pnl": -2189.0,
+      "positions": [
+        {
+          "symbol": "ABBV",
+          "qty": 48.0,
+          "avg_entry": 262.9125,
+          "current_price": 244.0096,
+          "market_value": 11712.4608,
+          "unrealized_pnl": -907.3392,
+          "side": "long"
+        },
+        {
+          "symbol": "AMD",
+          "qty": 9.0,
+          "avg_entry": 459.097778,
+          "current_price": 490.51,
+          "market_value": 4414.59,
+          "unrealized_pnl": 282.709998,
+          "side": "long"
+        },
+        {
+          "symbol": "CSCO",
+          "qty": 83.0,
+          "avg_entry": 116.113373,
+          "current_price": 121.3,
+          "market_value": 10067.9,
+          "unrealized_pnl": 430.490041,
+          "side": "long"
+        },
+        {
+          "symbol": "GE",
+          "qty": 26.0,
+          "avg_entry": 362.59,
+          "current_price": 374.67,
+          "market_value": 9741.42,
+          "unrealized_pnl": 314.08,
+          "side": "long"
+        },
+        {
+          "symbol": "JNJ",
+          "qty": 44.0,
+          "avg_entry": 267.2,
+          "current_price": 257.75,
+          "market_value": 11341.0,
+          "unrealized_pnl": -415.8,
+          "side": "long"
+        },
+        {
+          "symbol": "MRK",
+          "qty": 82.0,
+          "avg_entry": 131.53,
+          "current_price": 128.37,
+          "market_value": 10526.34,
+          "unrealized_pnl": -259.12,
+          "side": "long"
+        },
+        {
+          "symbol": "UNH",
+          "qty": 28.0,
+          "avg_entry": 429.631429,
+          "current_price": 404.0599,
+          "market_value": 11313.6772,
+          "unrealized_pnl": -716.002812,
+          "side": "long"
+        }
+      ]
     }
   ]
 }
