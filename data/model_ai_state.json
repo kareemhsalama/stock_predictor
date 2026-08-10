@@ -13,15 +13,15 @@
     },
     "CSCO": {
       "entry_date": "2026-07-30",
-      "peak_price": 122.665
+      "peak_price": 123.98
     },
     "JNJ": {
       "entry_date": "2026-07-30",
-      "peak_price": 259.105
+      "peak_price": 261.35
     },
     "MRK": {
       "entry_date": "2026-07-30",
-      "peak_price": 130.7
+      "peak_price": 130.97
     },
     "UNH": {
       "entry_date": "2026-07-30",
@@ -33,7 +33,7 @@
     },
     "LLY": {
       "entry_date": "2026-08-10",
-      "peak_price": 1214.3125
+      "peak_price": 1216.12
     }
   }
 }
