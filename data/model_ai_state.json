@@ -15,10 +15,6 @@
       "entry_date": "2026-07-30",
       "peak_price": 122.665
     },
-    "GE": {
-      "entry_date": "2026-07-30",
-      "peak_price": 381.235
-    },
     "JNJ": {
       "entry_date": "2026-07-30",
       "peak_price": 259.105
@@ -30,6 +26,14 @@
     "UNH": {
       "entry_date": "2026-07-30",
       "peak_price": 425.47
+    },
+    "BAC": {
+      "entry_date": "2026-08-10",
+      "peak_price": 63.845001220703125
+    },
+    "LLY": {
+      "entry_date": "2026-08-10",
+      "peak_price": 1214.3125
     }
   }
 }
