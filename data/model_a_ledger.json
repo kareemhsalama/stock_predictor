@@ -1000,6 +1000,32 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-08-11",
+      "equity": 101256.59,
+      "cash": 85086.71,
+      "pnl": 1256.5899999999965,
+      "positions": [
+        {
+          "symbol": "MSFT",
+          "qty": 15.0,
+          "avg_entry": 503.32,
+          "current_price": 501.676,
+          "market_value": 7525.14,
+          "unrealized_pnl": -24.66,
+          "side": "long"
+        },
+        {
+          "symbol": "TSLA",
+          "qty": 26.0,
+          "avg_entry": 328.704615,
+          "current_price": 332.49,
+          "market_value": 8644.74,
+          "unrealized_pnl": 98.42001,
+          "side": "long"
+        }
+      ]
     }
   ]
 }
