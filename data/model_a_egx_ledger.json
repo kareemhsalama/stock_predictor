@@ -4,8 +4,13 @@
   "market": "EGX",
   "currency": "EGP",
   "initial_budget": 1000000.0,
-  "cash": 999937.0368347168,
-  "positions": {},
+  "cash": 899985.4337158203,
+  "positions": {
+    "TMGH.CA": {
+      "qty": 1022,
+      "avg_price": 97.80000305175781
+    }
+  },
   "trade_log": [
     {
       "timestamp": "2026-07-16T16:33:04.658395+00:00",
@@ -91,6 +96,14 @@
       "price": 139.14999389648438,
       "proceeds": 99213.94564819336,
       "pnl": -770.0413055419922
+    },
+    {
+      "timestamp": "2026-08-17T13:20:44.204397+00:00",
+      "side": "BUY",
+      "symbol": "TMGH.CA",
+      "qty": 1022,
+      "price": 97.80000305175781,
+      "cost": 99951.60311889648
     }
   ],
   "snapshots": [
@@ -327,6 +340,23 @@
       "cash": 999937.04,
       "pnl": -62.96,
       "positions": []
+    },
+    {
+      "date": "2026-08-17",
+      "equity": 999937.03,
+      "cash": 899985.43,
+      "pnl": -62.97,
+      "positions": [
+        {
+          "symbol": "TMGH.CA",
+          "qty": 1022.0,
+          "avg_entry": 97.8,
+          "current_price": 97.8,
+          "market_value": 99951.6,
+          "unrealized_pnl": 0.0,
+          "side": "long"
+        }
+      ]
     }
   ],
   "extra": {}
