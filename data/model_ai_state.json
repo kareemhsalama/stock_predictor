@@ -3,17 +3,9 @@
   "breaker_on": false,
   "bootstrapped": true,
   "positions": {
-    "ABBV": {
-      "entry_date": "2026-07-30",
-      "peak_price": 258.865
-    },
     "AMD": {
       "entry_date": "2026-07-30",
       "peak_price": 527.24
-    },
-    "CSCO": {
-      "entry_date": "2026-07-30",
-      "peak_price": 123.98
     },
     "JNJ": {
       "entry_date": "2026-07-30",
@@ -23,10 +15,6 @@
       "entry_date": "2026-07-30",
       "peak_price": 134.61
     },
-    "UNH": {
-      "entry_date": "2026-07-30",
-      "peak_price": 425.47
-    },
     "BAC": {
       "entry_date": "2026-08-10",
       "peak_price": 64.53
@@ -34,6 +22,18 @@
     "LLY": {
       "entry_date": "2026-08-10",
       "peak_price": 1219.7325
+    },
+    "GE": {
+      "entry_date": "2026-08-17",
+      "peak_price": 368.3949890136719
+    },
+    "RTX": {
+      "entry_date": "2026-08-17",
+      "peak_price": 223.60000610351562
+    },
+    "CAT": {
+      "entry_date": "2026-08-17",
+      "peak_price": 876.75
     }
   }
 }
