@@ -9,15 +9,15 @@
     },
     "JNJ": {
       "entry_date": "2026-07-30",
-      "peak_price": 261.35
+      "peak_price": 263.635
     },
     "MRK": {
       "entry_date": "2026-07-30",
-      "peak_price": 134.61
+      "peak_price": 137.04
     },
     "BAC": {
       "entry_date": "2026-08-10",
-      "peak_price": 64.53
+      "peak_price": 64.795
     },
     "LLY": {
       "entry_date": "2026-08-10",
@@ -25,7 +25,7 @@
     },
     "GE": {
       "entry_date": "2026-08-17",
-      "peak_price": 368.3949890136719
+      "peak_price": 370.22
     },
     "RTX": {
       "entry_date": "2026-08-17",
@@ -33,7 +33,7 @@
     },
     "CAT": {
       "entry_date": "2026-08-17",
-      "peak_price": 876.75
+      "peak_price": 882.19
     }
   }
 }
