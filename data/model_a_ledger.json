@@ -1067,6 +1067,41 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-08-17",
+      "equity": 101274.31,
+      "cash": 73976.19,
+      "pnl": 1274.3099999999977,
+      "positions": [
+        {
+          "symbol": "AAPL",
+          "qty": 29.0,
+          "avg_entry": 304.17,
+          "current_price": 305.19,
+          "market_value": 8850.51,
+          "unrealized_pnl": 29.58,
+          "side": "long"
+        },
+        {
+          "symbol": "GOOGL",
+          "qty": 25.0,
+          "avg_entry": 343.18,
+          "current_price": 343.75,
+          "market_value": 8593.75,
+          "unrealized_pnl": 14.25,
+          "side": "long"
+        },
+        {
+          "symbol": "TSLA",
+          "qty": 29.0,
+          "avg_entry": 336.729655,
+          "current_price": 339.7884,
+          "market_value": 9853.8636,
+          "unrealized_pnl": 88.703605,
+          "side": "long"
+        }
+      ]
     }
   ]
 }
