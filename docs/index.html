@@ -303,6 +303,54 @@
     color: var(--amber);
   }
 
+  /* A model whose data has stopped arriving must never look like a model
+     that is simply flat. */
+  .status-badge.stale {
+    background: rgba(251, 191, 36, 0.12);
+    border-color: rgba(251, 191, 36, 0.4);
+    color: var(--amber);
+  }
+
+  .status-badge.broken {
+    background: rgba(248, 113, 113, 0.14);
+    border-color: rgba(248, 113, 113, 0.5);
+    color: var(--red);
+  }
+
+  .health-note {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+  }
+
+  .health-note.warn {
+    background: rgba(251, 191, 36, 0.06);
+    border: 1px solid rgba(251, 191, 36, 0.25);
+  }
+
+  .health-note.warn .icon { color: var(--amber); }
+
+  .health-note.bad {
+    background: rgba(248, 113, 113, 0.06);
+    border: 1px solid rgba(248, 113, 113, 0.3);
+  }
+
+  .health-note.bad .icon { color: var(--red); }
+
+  .cost-note {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-muted);
+    margin-top: 8px;
+    line-height: 1.6;
+  }
+
   .bench-note {
     font-size: 11px;
     line-height: 1.5;
@@ -470,11 +518,11 @@ const SECTIONS = [
     title: "US Markets",
     currency: USD,
     models: [
-      { key: "a-us", file: "data/model_a_ledger.json", benchmarks: ["SP500"],
+      { key: "a-us", file: "data/model_a_ledger.json", benchmarks: ["SP500"], market: "US",
         name: "Model A", subtitle: "· Technical ML · Random Forest", currency: USD },
-      { key: "d-us", file: "data/model_d_ledger.json", benchmarks: ["SP500"],
+      { key: "d-us", file: "data/model_d_ledger.json", benchmarks: ["SP500"], market: "US",
         name: "Model D", subtitle: "· Mean Reversion · Z-Score", currency: USD },
-      { key: "ai-us", file: "data/model_ai_ledger.json", benchmarks: ["SP500"],
+      { key: "ai-us", file: "data/model_ai_ledger.json", benchmarks: ["SP500"], market: "US",
         name: "Model AI", subtitle: "· Regime Momentum · Vol Target", currency: USD },
     ],
   },
@@ -482,9 +530,9 @@ const SECTIONS = [
     title: "EGX (Egyptian Exchange)",
     currency: EGP,
     models: [
-      { key: "a-egx", file: "data/model_a_egx_ledger.json", benchmarks: ["EGX30", "EGX30_EW"],
+      { key: "a-egx", file: "data/model_a_egx_ledger.json", benchmarks: ["EGX30", "EGX30_EW"], market: "EGX",
         name: "Model A · EGX", subtitle: "· Technical ML · Random Forest", currency: EGP },
-      { key: "ai-egx", file: "data/model_ai_egx_ledger.json", benchmarks: ["EGX30", "EGX30_EW"],
+      { key: "ai-egx", file: "data/model_ai_egx_ledger.json", benchmarks: ["EGX30", "EGX30_EW"], market: "EGX",
         name: "Model AI · EGX", subtitle: "· Regime Momentum · Vol Target", currency: EGP },
     ],
   },
@@ -499,6 +547,17 @@ const BENCH_CARDS = [
   { key: "EGX30", panelKey: "bench-egx30" },
   { key: "EGX30_EW", panelKey: "bench-egx30ew" },
 ];
+
+// Which benchmark series doubles as each market's trading calendar. These
+// series are the days the market actually traded, so they answer "should there
+// have been a snapshot on this date?" without a hand-maintained holiday list.
+// Mirrors CALENDARS in scripts/check_freshness.py.
+const CALENDARS = { US: "SP500", EGX: "EGX30_EW" };
+
+// Sessions a ledger may lag before the panel says so. One absorbs a late
+// Actions run; interior gaps are flagged no matter how fresh the tail is.
+const STALE_AFTER_SESSIONS = 1;
+const BROKEN_AFTER_SESSIONS = 3;
 
 // Beta / correlation off three or four points is noise dressed as a statistic.
 const MIN_COMPARE_DAYS = 5;
@@ -690,6 +749,75 @@ function compareToBenchmark(pairs) {
 }
 
 // ===================================================
+// Pipeline health
+// ===================================================
+// A ledger that stopped updating draws the same confident flat line as a model
+// deliberately sitting in cash. Distinguishing them needs the market calendar,
+// which the benchmark series already are. Mirrors scripts/check_freshness.py —
+// the heartbeat catches this server-side, this makes it visible here too.
+function assessHealth(model, snapshots) {
+  const calendarKey = CALENDARS[model.market];
+  const bench = calendarKey ? BENCHMARKS[calendarKey] : null;
+  const calendar = (bench && bench.series || []).map(p => p.date);
+
+  if (!calendar.length || !snapshots.length) {
+    return { known: false, behind: 0, gaps: [] };
+  }
+
+  const dates = new Set(snapshots.map(s => s.date));
+  const first = snapshots[0].date;
+  const last = snapshots[snapshots.length - 1].date;
+
+  const gaps = calendar.filter(d => d >= first && d <= last && !dates.has(d));
+  const behind = calendar.filter(d => d > last).length;
+
+  return { known: true, behind, gaps, latestSession: calendar[calendar.length - 1] };
+}
+
+function healthBadge(health) {
+  if (!health.known) return null;
+  if (health.behind >= BROKEN_AFTER_SESSIONS) {
+    return { cls: "broken", text: `STALE · ${health.behind} SESSIONS` };
+  }
+  if (health.behind > STALE_AFTER_SESSIONS) {
+    return { cls: "stale", text: `STALE · ${health.behind} SESSIONS` };
+  }
+  return null;
+}
+
+function healthNoteHTML(health) {
+  if (!health.known) return "";
+  const notes = [];
+
+  if (health.behind > STALE_AFTER_SESSIONS) {
+    const bad = health.behind >= BROKEN_AFTER_SESSIONS;
+    notes.push(`
+      <div class="health-note ${bad ? "bad" : "warn"}">
+        <span class="icon">${bad ? "⛔" : "⚠"}</span>
+        <span>No snapshot for the last ${health.behind} trading sessions
+        (latest session: ${health.latestSession}). The line below ends where the
+        data stopped, not where the model did — every figure on this panel is
+        computed over that shorter window.</span>
+      </div>`);
+  }
+
+  if (health.gaps.length) {
+    const shown = health.gaps.slice(0, 5).join(", ");
+    const more = health.gaps.length > 5 ? ` (+${health.gaps.length - 5} more)` : "";
+    notes.push(`
+      <div class="health-note warn">
+        <span class="icon">⚠</span>
+        <span>${health.gaps.length} session${health.gaps.length === 1 ? "" : "s"}
+        missing inside this window: ${shown}${more}. Returns spanning a gap
+        cover more than one day, so Sharpe and drawdown are slightly
+        overstated.</span>
+      </div>`);
+  }
+
+  return notes.join("");
+}
+
+// ===================================================
 // Rendering
 // ===================================================
 function panelSkeleton(model) {
@@ -780,6 +908,31 @@ function renderComparisonHTML(choice) {
         <div class="value ${t.good === null ? "" : t.good ? "up" : "down"}">${t.value}</div>
       </div>`).join("")}</div>
     ${proxyNote}`);
+}
+
+// Paper fills used to be free and instantaneous, which flattered every EGX
+// result. They now carry commission, stamp duty, spread and size impact — but
+// only from the date the cost model was switched on, so the panel says which
+// part of its own curve was earned under which rules.
+function renderCostsHTML(ledger, cur) {
+  if (!ledger.cost_model_from) return "";
+  const fees = ledger.fees_paid || 0;
+  const slip = ledger.slippage_paid || 0;
+  const cm = ledger.cost_model || {};
+
+  const roundTrip = ((cm.commission_bps || 0) + (cm.stamp_duty_bps || 0)) * 2 / 100;
+  const spec = cm.commission_bps != null
+    ? `${roundTrip.toFixed(2)}% round-trip fees · ${cm.half_spread_bps} bps spread · ` +
+      `capped at ${(cm.max_participation * 100).toFixed(0)}% of ADV`
+    : "";
+
+  return `<div class="cost-note">
+    EXECUTION COSTS FROM ${ledger.cost_model_from} —
+    ${fmtMoney(fees, cur, { digits: 0 })} fees,
+    ${fmtMoney(slip, cur, { digits: 0 })} slippage paid to date.
+    ${spec}<br>
+    Fills before that date were free and unlimited; the curve mixes both regimes.
+  </div>`;
 }
 
 function renderPositionsHTML(positions, cur) {
@@ -914,8 +1067,15 @@ function renderPanel(model, ledger) {
   const initialBudget = ledger.initial_budget ?? snapshots[0].equity;
   const m = computeMetrics(snapshots, initialBudget);
   const traded = hasTraded(snapshots, initialBudget);
+  const health = assessHealth(model, snapshots);
 
-  if (traded) {
+  // Staleness outranks both LIVE and NO SIGNAL: if the data stopped arriving,
+  // nothing else the panel says about "now" is true.
+  const stale = healthBadge(health);
+  if (stale) {
+    badge.className = `status-badge ${stale.cls}`;
+    badge.textContent = stale.text;
+  } else if (traded) {
     badge.className = "status-badge";
     badge.innerHTML = `<span class="pulse"></span>LIVE`;
   } else {
@@ -941,12 +1101,14 @@ function renderPanel(model, ledger) {
     </div>` : "";
 
   body.innerHTML = `
+    ${healthNoteHTML(health)}
     ${flatNote}
     ${legend}
     <div class="chart-wrap"><canvas id="chart-${model.key}"></canvas></div>
     ${renderMetricsHTML(m, model.currency)}
     ${renderComparisonHTML(choice)}
     ${renderPositionsHTML(m.positions, model.currency)}
+    ${renderCostsHTML(ledger, model.currency)}
     <div class="last-updated">Last snapshot: ${m.latestDate}</div>`;
 
   renderChart(`chart-${model.key}`, snapshots, m, model.currency, overlay);

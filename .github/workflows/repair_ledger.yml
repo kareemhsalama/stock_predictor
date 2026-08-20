@@ -1,0 +1,84 @@
+name: Repair Ledger (manual)
+
+# Manual reconciliation of a US ledger against Alpaca's portfolio history.
+# Lives here rather than being a local-only script because each model's account
+# has its own key pair, and ALPACA_API_KEY_AI exists only as a repo secret.
+#
+# Defaults to a dry run: it prints what it would change and writes nothing.
+
+on:
+  workflow_dispatch:
+    inputs:
+      model:
+        description: "Which model's ledger to repair"
+        required: true
+        type: choice
+        options: [A, D, AI]
+      apply:
+        description: "Write the changes (unchecked = dry run)"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Select the account and ledger
+        id: target
+        run: |
+          case "${{ inputs.model }}" in
+            A)  echo "ledger=data/model_a_ledger.json"  >> "$GITHUB_OUTPUT" ;;
+            D)  echo "ledger=data/model_d_ledger.json"  >> "$GITHUB_OUTPUT" ;;
+            AI) echo "ledger=data/model_ai_ledger.json" >> "$GITHUB_OUTPUT" ;;
+          esac
+
+      - name: Repair
+        env:
+          # Each model is an isolated paper account. A `false && x || y` chain
+          # also falls through when a secret is merely empty, so the keys are
+          # checked below before they can be pointed at the wrong ledger.
+          ALPACA_API_KEY: ${{ inputs.model == 'A' && secrets.ALPACA_API_KEY || inputs.model == 'D' && secrets.ALPACA_API_KEY_D || secrets.ALPACA_API_KEY_AI }}
+          ALPACA_SECRET_KEY: ${{ inputs.model == 'A' && secrets.ALPACA_SECRET_KEY || inputs.model == 'D' && secrets.ALPACA_SECRET_KEY_D || secrets.ALPACA_SECRET_KEY_AI }}
+        run: |
+          if [ -z "$ALPACA_API_KEY" ] || [ -z "$ALPACA_SECRET_KEY" ]; then
+            echo "::error::No credentials resolved for model ${{ inputs.model }}."
+            echo "Check that the account's secrets exist and are non-empty."
+            exit 1
+          fi
+          python scripts/repair_ledger.py \
+            --ledger "${{ steps.target.outputs.ledger }}" \
+            ${{ inputs.apply && '--apply' || '' }}
+
+      - name: Commit the repaired ledger
+        if: inputs.apply
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "${{ steps.target.outputs.ledger }}"
+          git diff --cached --quiet || git commit -m "repair: Model ${{ inputs.model }} ledger reconciled with Alpaca history"
+          git pull --rebase --autostash
+          git push
+
+      - name: Report pipeline health
+        if: inputs.apply
+        # Informational: this reports on every ledger, so an unrelated model's
+        # gap must not fail a repair that already succeeded and committed.
+        continue-on-error: true
+        run: python scripts/check_freshness.py

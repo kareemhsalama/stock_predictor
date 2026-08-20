@@ -1,0 +1,74 @@
+name: Pipeline Heartbeat
+
+# The pipeline's own watchdog. Six workflows write ledgers on their own
+# schedules and none of them can tell whether the others ran: on 2026-08-06 the
+# US trade jobs were cancelled while queued and a delayed snapshot misfiled its
+# session, and the hole sat there unnoticed for two weeks because the dashboard
+# draws a perfectly confident line through missing days.
+#
+# So: check every ledger against the market calendar once a day, fail loudly,
+# and keep one tracking issue in sync with the current state.
+
+on:
+  schedule:
+    # 06:00 UTC - after every trading job for the previous session on both
+    # calendars (EGX 12:35, US 21:30-22:00), and before the next one starts.
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  heartbeat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check ledger freshness
+        id: check
+        # One session of lag is tolerated: Actions cron routinely runs hours
+        # late, and a job that merely ran late is not a broken pipeline.
+        # Interior gaps are reported regardless of lag.
+        run: python scripts/check_freshness.py --max-lag 1 --report health.md
+
+      - name: Open or update the tracking issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          MARKER="[pipeline-health]"
+          number=$(gh issue list --state open --search "in:title $MARKER" \
+                     --json number --jq '.[0].number // empty')
+          if [ -n "$number" ]; then
+            # Rewrite the body rather than commenting, so the issue always
+            # shows the current state instead of a wall of daily repeats.
+            gh issue edit "$number" --body-file health.md
+            echo "Updated issue #$number"
+          else
+            gh issue create \
+              --title "$MARKER ledger gaps or staleness detected" \
+              --body-file health.md
+          fi
+
+      - name: Close the tracking issue
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          MARKER="[pipeline-health]"
+          number=$(gh issue list --state open --search "in:title $MARKER" \
+                     --json number --jq '.[0].number // empty')
+          if [ -n "$number" ]; then
+            gh issue close "$number" \
+              --comment "All ledgers current and gap-free as of $(date -u +'%Y-%m-%d %H:%M UTC')."
+          fi

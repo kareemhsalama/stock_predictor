@@ -4,23 +4,6 @@
   "initial_budget": 100000,
   "snapshots": [
     {
-      "date": "2026-06-19",
-      "equity": 99872.04,
-      "cash": 91655.13,
-      "pnl": -127.96,
-      "positions": [
-        {
-          "symbol": "NVDA",
-          "qty": 39.0,
-          "avg_entry": 207.318205,
-          "current_price": 210.69,
-          "market_value": 8216.91,
-          "unrealized_pnl": 131.500005,
-          "side": "long"
-        }
-      ]
-    },
-    {
       "date": "2026-06-22",
       "equity": 99679.71,
       "cash": 74239.33,
@@ -286,41 +269,6 @@
           "current_price": 390.659,
           "market_value": 9375.816,
           "unrealized_pnl": 111.576,
-          "side": "long"
-        }
-      ]
-    },
-    {
-      "date": "2026-07-03",
-      "equity": 100000.38,
-      "cash": 74480.15,
-      "pnl": 0.38,
-      "positions": [
-        {
-          "symbol": "AAPL",
-          "qty": 29.0,
-          "avg_entry": 277.26,
-          "current_price": 308.63,
-          "market_value": 8950.27,
-          "unrealized_pnl": 909.73,
-          "side": "long"
-        },
-        {
-          "symbol": "GOOGL",
-          "qty": 20.0,
-          "avg_entry": 355.8,
-          "current_price": 359.91,
-          "market_value": 7198.2,
-          "unrealized_pnl": 82.2,
-          "side": "long"
-        },
-        {
-          "symbol": "MSFT",
-          "qty": 24.0,
-          "avg_entry": 386.01,
-          "current_price": 390.49,
-          "market_value": 9371.76,
-          "unrealized_pnl": 107.52,
           "side": "long"
         }
       ]
@@ -932,7 +880,7 @@
       ]
     },
     {
-      "date": "2026-08-07",
+      "date": "2026-08-06",
       "equity": 101058.64,
       "cash": 77593.45,
       "pnl": 1058.6399999999994,
@@ -965,6 +913,15 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-08-07",
+      "equity": 101277.87,
+      "cash": null,
+      "pnl": 1277.87,
+      "positions": [],
+      "backfilled": "alpaca-portfolio-history",
+      "note": "equity restored from the broker; position detail for this session is not recoverable"
     },
     {
       "date": "2026-08-10",

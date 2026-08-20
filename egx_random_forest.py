@@ -75,24 +75,35 @@ def engineer_features(data):
     return data
 
 
+# Window for average daily traded value, which sets the fill's impact term and
+# the participation cap in PaperTrader. 20 sessions is a month of EGX trading —
+# long enough to survive one dead day, short enough to track a drying-up name.
+ADV_WINDOW = 20
+
+
 def predict_signal(ticker):
     """
     Train an RF on `ticker`'s history and predict tomorrow's up-probability.
 
-    Returns (confidence, last_close), or (None, None) if there isn't enough
-    usable data (holiday / illiquid / delisted).
+    Returns (confidence, last_close, adv_value), or (None, None, None) if there
+    isn't enough usable data (holiday / illiquid / delisted). ``adv_value`` is
+    average daily traded value in EGP.
     """
     data = yf.download(ticker, period="2y", multi_level_index=False,
                        auto_adjust=True, progress=False)
     if data is None or data.empty:
         print(f"[{ticker}] no data — skipping")
-        return None, None
+        return None, None, None
 
     # Defensive: collapse a MultiIndex if yfinance still returns one.
     if hasattr(data.columns, "nlevels") and data.columns.nlevels > 1:
         data.columns = data.columns.get_level_values(0)
 
     last_close = float(data["Close"].iloc[-1])
+    adv_value = float((data["Close"] * data["Volume"])
+                      .tail(ADV_WINDOW).mean())
+    if not np.isfinite(adv_value) or adv_value <= 0:
+        adv_value = None
 
     data = engineer_features(data)
     # EGX has zero-volume days, so volume-based ratios can yield ±inf; drop
@@ -100,7 +111,7 @@ def predict_signal(ticker):
     data = data.replace([np.inf, -np.inf], np.nan).dropna()
     if len(data) < 50:
         print(f"[{ticker}] only {len(data)} usable rows — skipping")
-        return None, last_close
+        return None, last_close, adv_value
 
     # Train on everything except the final (still-open) row, exactly like
     # live_trader.py: the last row's Target is unknown until tomorrow.
@@ -112,8 +123,10 @@ def predict_signal(ticker):
 
     today = data[FEATURES].iloc[[-1]]
     confidence = float(model.predict_proba(today)[0, 1])
-    print(f"[{ticker}] confidence = {confidence:.1%} | last close = {last_close:.2f} EGP")
-    return confidence, last_close
+    adv_note = f"{adv_value:,.0f} EGP" if adv_value else "unknown"
+    print(f"[{ticker}] confidence = {confidence:.1%} | last close = "
+          f"{last_close:.2f} EGP | ADV = {adv_note}")
+    return confidence, last_close, adv_value
 
 
 def run():
@@ -128,7 +141,7 @@ def run():
     prices = {}
     for ticker in EGX_TICKERS:
         try:
-            confidence, price = predict_signal(ticker)
+            confidence, price, adv_value = predict_signal(ticker)
         except Exception as e:
             print(f"[{ticker}] error: {e}")
             continue
@@ -140,14 +153,17 @@ def run():
         held_qty = trader.position_qty(ticker)
 
         if confidence > THRESHOLD and held_qty == 0:
-            spend = trader.cash * RISK_PCT
-            qty = int(spend / price)
+            # Size through affordable_qty so fees come out of the slice rather
+            # than pushing the order past the cash balance and getting it
+            # rejected at the boundary.
+            qty = trader.affordable_qty(price, adv_value,
+                                        budget=trader.cash * RISK_PCT)
             if qty > 0:
-                trader.buy(ticker, qty, price)
+                trader.buy(ticker, qty, price, adv_value)
             else:
                 print(f"[{ticker}] BUY skipped — cash slice too small for 1 share")
         elif confidence <= THRESHOLD and held_qty > 0:
-            trader.sell(ticker, held_qty, price)
+            trader.sell(ticker, held_qty, price, adv_value)
         else:
             action = "HOLD" if held_qty > 0 else "STAY FLAT"
             print(f"[{ticker}] {action}")
@@ -156,6 +172,9 @@ def run():
     print(f"\n--- EGX Model A snapshot {snap['date']} ---")
     print(f"  Equity: {snap['equity']:,.2f} EGP | "
           f"Cash: {snap['cash']:,.2f} EGP | PnL: {snap['pnl']:+,.2f} EGP")
+    print(f"  Costs to date: {trader.fees_paid:,.2f} EGP fees + "
+          f"{trader.slippage_paid:,.2f} EGP slippage "
+          f"(applied from {trader.cost_model_from})")
     print(f"  Open positions: {len(snap['positions'])}")
     print(f"  Ledger: {trader.ledger_path}")
 

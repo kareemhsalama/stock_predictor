@@ -55,9 +55,27 @@ def _sync_position_state(trader: PaperTrader, prices: dict[str, float]):
     return state
 
 
+def average_daily_value(data: model_ai.PriceData, window: int = 20) -> dict[str, float]:
+    """
+    Average daily traded value per name, in EGP.
+
+    Feeds PaperTrader's impact term and participation cap. Without it every
+    fill is priced as if the book were infinitely deep, which on EGX is the
+    single most flattering assumption the simulator can make.
+    """
+    adv = {}
+    for sym in data.close.columns:
+        value = (data.close[sym] * data.volume[sym]).tail(window).mean()
+        if value == value and value > 0:      # NaN-safe
+            adv[sym] = float(value)
+    return adv
+
+
 def apply_stops(trader: PaperTrader, data: model_ai.PriceData,
-                prices: dict[str, float], cfg: dict) -> None:
+                prices: dict[str, float], cfg: dict,
+                adv: dict[str, float] | None = None) -> None:
     """Hard stop + ATR trailing stop, checked every run."""
+    adv = adv or {}
     peaks = _sync_position_state(trader, prices)
 
     for sym in list(trader.positions):
@@ -80,13 +98,21 @@ def apply_stops(trader: PaperTrader, data: model_ai.PriceData,
 
         if reason:
             print(f"  STOP {sym}: {reason}")
-            trader.sell(sym, int(pos["qty"]), px)
-            peaks.pop(sym, None)
+            result = trader.sell(sym, int(pos["qty"]), px, adv.get(sym))
+            # A thin name may only part-exit today; keep its high-water mark
+            # so the trail still governs the remainder tomorrow.
+            if sym not in trader.positions:
+                peaks.pop(sym, None)
+            elif result.get("partial"):
+                print(f"    {sym}: {trader.position_qty(sym)} shares still held "
+                      f"— stop continues next session")
 
 
 def rebalance(trader: PaperTrader, data: model_ai.PriceData,
-              prices: dict[str, float], cfg: dict) -> None:
+              prices: dict[str, float], cfg: dict,
+              adv: dict[str, float] | None = None) -> None:
     """Move the book toward MODEL_AI's target weights."""
+    adv = adv or {}
     as_of = data.close.index[-1]
     targets = model_ai.generate_target_weights(as_of, MARKET, cfg, data)
 
@@ -100,7 +126,7 @@ def rebalance(trader: PaperTrader, data: model_ai.PriceData,
             px = prices.get(sym)
             if px:
                 print(f"  exit {sym}: dropped from targets")
-                trader.sell(sym, int(trader.positions[sym]["qty"]), px)
+                trader.sell(sym, int(trader.positions[sym]["qty"]), px, adv.get(sym))
 
     for sym, weight in sorted(targets.items(), key=lambda kv: -kv[1]):
         px = prices.get(sym)
@@ -113,9 +139,15 @@ def rebalance(trader: PaperTrader, data: model_ai.PriceData,
         if abs(delta) * px < equity * 0.01:      # ignore sub-1% drift
             continue
         if delta > 0:
-            trader.buy(sym, delta, px)
+            # Cap the buy at what cash covers once fees are counted; the
+            # target weight is a goal, not a promise the book can fund.
+            qty = min(delta, trader.affordable_qty(px, adv.get(sym)))
+            if qty > 0:
+                trader.buy(sym, qty, px, adv.get(sym))
+            else:
+                print(f"  {sym}: skipped — cash cannot fund 1 share with fees")
         elif delta < 0:
-            trader.sell(sym, -delta, px)
+            trader.sell(sym, -delta, px, adv.get(sym))
 
 
 def run():
@@ -132,9 +164,12 @@ def run():
               for t in data.close.columns
               if data.close[t].iloc[-1] == data.close[t].iloc[-1]}
 
-    print(f"=== MODEL_AI EGX {latest.date()} ===")
+    adv = average_daily_value(data)
 
-    apply_stops(trader, data, prices, cfg)
+    print(f"=== MODEL_AI EGX {latest.date()} ===")
+    print(f"ADV known for {len(adv)}/{len(data.close.columns)} names")
+
+    apply_stops(trader, data, prices, cfg, adv)
 
     # Bootstrap on the first run ever: waiting for the weekly Sunday slot would
     # leave a freshly deployed model in cash for up to six days. One-shot flag
@@ -147,7 +182,7 @@ def run():
         print(f"\nFirst run: bootstrapping the book rather than waiting for "
               f"weekday {REBALANCE_WEEKDAY}.")
     if first_run or weekday == REBALANCE_WEEKDAY:
-        rebalance(trader, data, prices, cfg)
+        rebalance(trader, data, prices, cfg, adv)
         trader.extra["bootstrapped"] = True
     else:
         print(f"\nNot rebalance day (weekday {weekday}, "
@@ -157,6 +192,9 @@ def run():
     print(f"\n--- MODEL_AI EGX snapshot {snap['date']} ---")
     print(f"  Equity: {snap['equity']:,.2f} EGP | Cash: {snap['cash']:,.2f} EGP "
           f"| PnL: {snap['pnl']:+,.2f} EGP")
+    print(f"  Costs to date: {trader.fees_paid:,.2f} EGP fees + "
+          f"{trader.slippage_paid:,.2f} EGP slippage "
+          f"(applied from {trader.cost_model_from})")
     print(f"  Open positions: {len(snap['positions'])}")
     print(f"  Ledger: {trader.ledger_path}")
 

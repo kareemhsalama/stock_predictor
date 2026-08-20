@@ -177,7 +177,7 @@
       ]
     },
     {
-      "date": "2026-08-07",
+      "date": "2026-08-06",
       "equity": 100284.24,
       "cash": 95598.09,
       "pnl": 284.24000000000524,
@@ -192,6 +192,15 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-08-07",
+      "equity": 100298.04,
+      "cash": null,
+      "pnl": 298.04,
+      "positions": [],
+      "backfilled": "alpaca-portfolio-history",
+      "note": "equity restored from the broker; position detail for this session is not recoverable"
     },
     {
       "date": "2026-08-10",
