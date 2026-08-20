@@ -6,6 +6,17 @@
   "initial_budget": 1000000.0,
   "cash": 998608.4337158203,
   "positions": {},
+  "fees_paid": 0.0,
+  "slippage_paid": 0.0,
+  "cost_model_from": "2026-08-20",
+  "cost_model": {
+    "commission_bps": 5.0,
+    "min_commission": 10.0,
+    "stamp_duty_bps": 2.5,
+    "half_spread_bps": 10.0,
+    "impact_coef_bps": 100.0,
+    "max_participation": 0.2
+  },
   "trade_log": [
     {
       "timestamp": "2026-07-16T16:33:04.658395+00:00",
@@ -371,6 +382,13 @@
     },
     {
       "date": "2026-08-19",
+      "equity": 998608.43,
+      "cash": 998608.43,
+      "pnl": -1391.57,
+      "positions": []
+    },
+    {
+      "date": "2026-08-20",
       "equity": 998608.43,
       "cash": 998608.43,
       "pnl": -1391.57,
