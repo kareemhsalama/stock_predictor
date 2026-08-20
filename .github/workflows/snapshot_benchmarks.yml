@@ -1,0 +1,47 @@
+name: Snapshot Benchmarks (S&P 500 / EGX 30)
+
+on:
+  schedule:
+    # Twice a day, once after each market's close, because the two series have
+    # different needs:
+    #   * ^GSPC has full history and simply backfills, so its run time is loose.
+    #   * ^CASE30 exposes no history at all - only the live level - so the EGX
+    #     series exists only as the points this job accrues. A missed EGX run
+    #     is a permanent hole in that series.
+    #
+    # 12:45 UTC, after the EGX model jobs (12:30 / 12:35) so the index level is
+    # filed against a settled close and the two jobs don't race on the push.
+    - cron: "45 12 * * 0-4"
+    # 21:45 UTC = 5:45 PM ET, after the US close and the Model A snapshot.
+    - cron: "45 21 * * 1-5"
+  workflow_dispatch:
+
+jobs:
+  benchmarks:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Update benchmark series
+        run: python scripts/snapshot_benchmarks.py
+
+      - name: Commit benchmark update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/benchmarks.json
+          git diff --cached --quiet || git commit -m "benchmarks: $(date -u +%Y-%m-%d)"
+          git pull --rebase --autostash
+          git push

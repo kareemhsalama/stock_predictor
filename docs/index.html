@@ -284,6 +284,113 @@
   .up { color: var(--green); }
   .down { color: var(--red); }
 
+  /* --- benchmark cards + model-vs-index comparison --- */
+  .model-panel.bench .dot { background: var(--amber); }
+
+  .model-banner .ticker {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 6px;
+  }
+
+  .status-badge.proxy {
+    background: rgba(251, 191, 36, 0.12);
+    border-color: rgba(251, 191, 36, 0.4);
+    color: var(--amber);
+  }
+
+  .bench-note {
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--text-muted);
+    margin-top: 10px;
+  }
+
+  .cmp-block {
+    border-top: 1px solid var(--border);
+    margin-top: 12px;
+    padding-top: 12px;
+  }
+
+  .cmp-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+
+  .cmp-head h3 {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+  }
+
+  .cmp-head .days {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-muted);
+  }
+
+  .pill {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-left: auto;
+  }
+
+  .pill.win {
+    background: rgba(74, 222, 128, 0.12);
+    border: 1px solid rgba(74, 222, 128, 0.4);
+    color: var(--green);
+  }
+
+  .pill.lose {
+    background: rgba(248, 113, 113, 0.12);
+    border: 1px solid rgba(248, 113, 113, 0.4);
+    color: var(--red);
+  }
+
+  .cmp-note {
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    background: rgba(148, 163, 184, 0.06);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+
+  .legend {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  .legend .swatch {
+    display: inline-block;
+    width: 14px;
+    height: 0;
+    border-top: 2px solid var(--cyan);
+    margin-right: 5px;
+    vertical-align: middle;
+  }
+
+  .legend .swatch.bench { border-top: 2px dashed var(--amber); }
+
   .empty-state {
     text-align: center;
     padding: 28px 16px;
@@ -330,6 +437,10 @@
       <div class="label">US P&L (USD)</div>
       <div class="value" id="total-pnl">—</div>
     </div>
+    <div class="header-stat">
+      <div class="label">S&P 500 (SAME WINDOW)</div>
+      <div class="value" id="sp500-return">—</div>
+    </div>
   </div>
 </div>
 
@@ -349,16 +460,21 @@ const EGP = { code: "EGP", symbol: "EGP ", axisDiv: 1000, axisSuffix: "k" };
 // Each model gets its own isolated ledger. New models render automatically as
 // their ledger files come online — a missing/empty ledger shows a placeholder
 // instead of breaking the page.
+// `benchmarks` is a preference order, not a single choice: the EGX models name
+// the real ^CASE30 series first and fall back to the equal-weight proxy, because
+// ^CASE30 has no history on the data provider and its series only accrues one
+// point per day (see scripts/snapshot_benchmarks.py). The first series with
+// enough overlapping days wins.
 const SECTIONS = [
   {
     title: "US Markets",
     currency: USD,
     models: [
-      { key: "a-us", file: "data/model_a_ledger.json",
+      { key: "a-us", file: "data/model_a_ledger.json", benchmarks: ["SP500"],
         name: "Model A", subtitle: "· Technical ML · Random Forest", currency: USD },
-      { key: "d-us", file: "data/model_d_ledger.json",
+      { key: "d-us", file: "data/model_d_ledger.json", benchmarks: ["SP500"],
         name: "Model D", subtitle: "· Mean Reversion · Z-Score", currency: USD },
-      { key: "ai-us", file: "data/model_ai_ledger.json",
+      { key: "ai-us", file: "data/model_ai_ledger.json", benchmarks: ["SP500"],
         name: "Model AI", subtitle: "· Regime Momentum · Vol Target", currency: USD },
     ],
   },
@@ -366,13 +482,29 @@ const SECTIONS = [
     title: "EGX (Egyptian Exchange)",
     currency: EGP,
     models: [
-      { key: "a-egx", file: "data/model_a_egx_ledger.json",
+      { key: "a-egx", file: "data/model_a_egx_ledger.json", benchmarks: ["EGX30", "EGX30_EW"],
         name: "Model A · EGX", subtitle: "· Technical ML · Random Forest", currency: EGP },
-      { key: "ai-egx", file: "data/model_ai_egx_ledger.json",
+      { key: "ai-egx", file: "data/model_ai_egx_ledger.json", benchmarks: ["EGX30", "EGX30_EW"],
         name: "Model AI · EGX", subtitle: "· Regime Momentum · Vol Target", currency: EGP },
     ],
   },
 ];
+
+const BENCH_FILE = "data/benchmarks.json";
+
+// Cards for the benchmark section, in display order. `key` indexes into
+// benchmarks.json; a missing entry just renders as offline.
+const BENCH_CARDS = [
+  { key: "SP500", panelKey: "bench-sp500" },
+  { key: "EGX30", panelKey: "bench-egx30" },
+  { key: "EGX30_EW", panelKey: "bench-egx30ew" },
+];
+
+// Beta / correlation off three or four points is noise dressed as a statistic.
+const MIN_COMPARE_DAYS = 5;
+
+// Populated by loadBenchmarks(): id -> { name, symbol, kind, series, note, ... }
+let BENCHMARKS = {};
 
 const rawUrl = (file) =>
   `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}/${file}`;
@@ -429,6 +561,135 @@ function computeMetrics(snapshots, initialBudget) {
 }
 
 // ===================================================
+// Benchmark alignment + comparison stats
+// ===================================================
+// Last close on or before each model date, so the chart overlay stays
+// continuous across a day the model snapshotted but the index did not trade
+// (US holidays, and the EGX/US calendars disagreeing in general).
+function alignAsOf(dates, series) {
+  const out = [];
+  let i = 0, last = null;
+  for (const d of dates) {
+    while (i < series.length && series[i].date <= d) last = series[i++].close;
+    out.push(last);
+  }
+  return out;
+}
+
+// Stats get an exact-date join instead: carrying a stale close forward would
+// manufacture a 0% index day and drag beta and correlation toward zero.
+function pairOnDate(snapshots, series) {
+  const byDate = new Map(series.map(p => [p.date, p.close]));
+  const pairs = [];
+  for (const s of snapshots) {
+    const close = byDate.get(s.date);
+    if (close != null) pairs.push({ date: s.date, equity: s.equity, close });
+  }
+  return pairs;
+}
+
+// First benchmark in the model's preference order with enough shared days to
+// support a regression. Returns the best near-miss otherwise, so the panel can
+// explain itself rather than going blank.
+function pickBenchmark(model, snapshots) {
+  let fallback = null;
+  for (const id of model.benchmarks || []) {
+    const bench = BENCHMARKS[id];
+    if (!bench || !(bench.series || []).length) continue;
+    const pairs = pairOnDate(snapshots, bench.series);
+    if (pairs.length >= MIN_COMPARE_DAYS) return { id, bench, pairs };
+    if (!fallback || pairs.length > fallback.pairs.length) fallback = { id, bench, pairs };
+  }
+  return fallback;
+}
+
+function stepReturns(values) {
+  const rets = [];
+  for (let i = 1; i < values.length; i++) {
+    if (values[i - 1] > 0) rets.push(values[i] / values[i - 1] - 1);
+  }
+  return rets;
+}
+
+const mean = (a) => a.reduce((x, y) => x + y, 0) / a.length;
+
+// Population variance, matching the Sharpe in computeMetrics — mixing divisors
+// between the two blocks would make the same series produce two vols.
+function variance(a, m) {
+  return a.reduce((s, v) => s + (v - m) ** 2, 0) / a.length;
+}
+
+function annualStats(closes) {
+  const rets = stepReturns(closes);
+  if (rets.length < 2) return { vol: 0, sharpe: 0 };
+  const m = mean(rets);
+  const sd = Math.sqrt(variance(rets, m));
+  return { vol: sd * Math.sqrt(252) * 100, sharpe: sd > 0 ? (m / sd) * Math.sqrt(252) : 0 };
+}
+
+function maxDrawdown(values) {
+  let peak = 0, dd = 0;
+  for (const v of values) {
+    peak = Math.max(peak, v);
+    if (peak > 0) dd = Math.max(dd, (peak - v) / peak);
+  }
+  return dd * 100;
+}
+
+// How the index itself did over the dashboard window.
+function benchmarkStats(series) {
+  const closes = series.map(p => p.close);
+  const totalReturn = closes.length > 1 ? (closes[closes.length - 1] / closes[0] - 1) * 100 : 0;
+  return {
+    ...annualStats(closes),
+    totalReturn,
+    maxDD: maxDrawdown(closes),
+    days: series.length,
+    level: closes[closes.length - 1],
+    from: series[0].date,
+    to: series[series.length - 1].date,
+  };
+}
+
+// Model vs index over the days they actually share. Both returns are measured
+// from the first shared day — NOT from the model's initial budget — so the two
+// numbers cover identical ground and the difference is attributable.
+function compareToBenchmark(pairs) {
+  const first = pairs[0], last = pairs[pairs.length - 1];
+  const modelReturn = (last.equity / first.equity - 1) * 100;
+  const benchReturn = (last.close / first.close - 1) * 100;
+
+  const rm = [], rb = [];
+  for (let i = 1; i < pairs.length; i++) {
+    if (pairs[i - 1].equity > 0 && pairs[i - 1].close > 0) {
+      rm.push(pairs[i].equity / pairs[i - 1].equity - 1);
+      rb.push(pairs[i].close / pairs[i - 1].close - 1);
+    }
+  }
+
+  const base = { days: pairs.length, from: first.date, to: last.date,
+                 modelReturn, benchReturn, excess: modelReturn - benchReturn };
+  if (rm.length < 2) return { ...base, beta: NaN, corr: NaN, alpha: NaN, te: NaN, ir: NaN };
+
+  const mm = mean(rm), mb = mean(rb);
+  const varM = variance(rm, mm), varB = variance(rb, mb);
+  const cov = rm.reduce((s, r, i) => s + (r - mm) * (rb[i] - mb), 0) / rm.length;
+
+  const beta = varB > 0 ? cov / varB : NaN;
+  const corr = varB > 0 && varM > 0 ? cov / Math.sqrt(varB * varM) : NaN;
+  // Jensen's alpha, annualized, risk-free rate taken as 0.
+  const alpha = Number.isFinite(beta) ? (mm - beta * mb) * 252 * 100 : NaN;
+
+  const diff = rm.map((r, i) => r - rb[i]);
+  const md = mean(diff);
+  const sdD = Math.sqrt(variance(diff, md));
+
+  return { ...base, beta, corr, alpha,
+           te: sdD * Math.sqrt(252) * 100,
+           ir: sdD > 0 ? (md / sdD) * Math.sqrt(252) : NaN };
+}
+
+// ===================================================
 // Rendering
 // ===================================================
 function panelSkeleton(model) {
@@ -462,6 +723,65 @@ function renderMetricsHTML(m, cur) {
     </div>`).join("")}</div>`;
 }
 
+const fmtPct = (v) => Number.isFinite(v) ? `${v >= 0 ? "+" : ""}${v.toFixed(2)}%` : "—";
+const fmtNum = (v) => Number.isFinite(v) ? v.toFixed(2) : "—";
+const benchLabel = (bench) => `${bench.name} (${bench.symbol})`;
+
+function renderComparisonHTML(choice) {
+  const wrap = (inner) => `<div class="cmp-block">${inner}</div>`;
+
+  if (!choice) {
+    return wrap(`<div class="cmp-head"><h3>vs index</h3></div>
+      <div class="cmp-note">No benchmark series loaded — ${BENCH_FILE} is missing
+      or empty. Run <code>scripts/snapshot_benchmarks.py</code> to seed it.</div>`);
+  }
+
+  const label = benchLabel(choice.bench);
+
+  // Too few shared days is the normal state for the real EGX 30 series, which
+  // starts accruing the day the collector first ran. Say that plainly instead
+  // of printing a beta computed off two points.
+  if (choice.pairs.length < MIN_COMPARE_DAYS) {
+    return wrap(`<div class="cmp-head"><h3>vs ${label}</h3>
+        <span class="days">${choice.pairs.length} shared day${choice.pairs.length === 1 ? "" : "s"}</span></div>
+      <div class="cmp-note">Not enough overlap yet — needs ${MIN_COMPARE_DAYS} days
+      the model and the index both have data for.${choice.bench.note ? ` ${choice.bench.note}` : ""}</div>`);
+  }
+
+  const c = compareToBenchmark(choice.pairs);
+  const beating = c.excess >= 0;
+
+  const tiles = [
+    { label: `${choice.bench.name}`, value: fmtPct(c.benchReturn), good: c.benchReturn >= 0 },
+    { label: "Model", value: fmtPct(c.modelReturn), good: c.modelReturn >= 0 },
+    { label: "Excess", value: fmtPct(c.excess), good: beating },
+    { label: "Alpha (ann.)", value: fmtPct(c.alpha), good: c.alpha >= 0 },
+    { label: "Beta", value: fmtNum(c.beta), good: null },
+    { label: "Correlation", value: fmtNum(c.corr), good: null },
+    { label: "Info ratio", value: fmtNum(c.ir), good: c.ir > 0 },
+    { label: "Tracking err", value: fmtPct(c.te).replace("+", ""), good: null },
+    { label: "Shared days", value: c.days, good: null },
+  ];
+
+  const proxyNote = choice.bench.kind === "proxy"
+    ? `<div class="bench-note">⚠ ${choice.bench.name} is a stand-in, not the index itself
+       — ${choice.bench.source}. ${choice.bench.note || ""}</div>`
+    : "";
+
+  return wrap(`
+    <div class="cmp-head">
+      <h3>vs ${label}</h3>
+      <span class="days">${c.from} → ${c.to}</span>
+      <span class="pill ${beating ? "win" : "lose"}">${beating ? "BEATING" : "TRAILING"}</span>
+    </div>
+    <div class="metrics-grid">${tiles.map(t => `
+      <div class="metric-card">
+        <div class="label">${t.label}</div>
+        <div class="value ${t.good === null ? "" : t.good ? "up" : "down"}">${t.value}</div>
+      </div>`).join("")}</div>
+    ${proxyNote}`);
+}
+
 function renderPositionsHTML(positions, cur) {
   if (!positions || positions.length === 0) {
     return `<div class="positions-section"><h3>Open positions</h3>
@@ -481,22 +801,42 @@ function renderPositionsHTML(positions, cur) {
     </table></div>`;
 }
 
-function renderChart(canvasId, snapshots, m, cur) {
+// The same starting capital, parked in the index from the first day the model
+// and the index share — the visual counterpart of the excess-return tile.
+function benchmarkOverlay(snapshots, choice) {
+  if (!choice || choice.pairs.length < 2) return null;
+  const anchor = choice.pairs[0];
+  const aligned = alignAsOf(snapshots.map(s => s.date), choice.bench.series);
+  return {
+    label: choice.bench.name,
+    data: aligned.map(v => v == null ? null : (v / anchor.close) * anchor.equity),
+  };
+}
+
+function renderChart(canvasId, snapshots, m, cur, overlay) {
   const ctx = document.getElementById(canvasId).getContext("2d");
   const labels = snapshots.map(s => s.date);
   const data = snapshots.map(s => s.equity);
 
+  const datasets = [{
+    label: "Equity", data,
+    borderColor: "#22d3ee",
+    backgroundColor: "rgba(34, 211, 238, 0.08)",
+    fill: true, tension: 0.3, pointRadius: 0, pointHitRadius: 10, borderWidth: 2,
+  }];
+
+  if (overlay) {
+    datasets.push({
+      label: overlay.label, data: overlay.data,
+      borderColor: "#fbbf24",
+      borderDash: [5, 4], borderWidth: 1.5,
+      fill: false, tension: 0.3, pointRadius: 0, pointHitRadius: 10, spanGaps: true,
+    });
+  }
+
   const chart = new Chart(ctx, {
     type: "line",
-    data: {
-      labels,
-      datasets: [{
-        label: "Equity", data,
-        borderColor: "#22d3ee",
-        backgroundColor: "rgba(34, 211, 238, 0.08)",
-        fill: true, tension: 0.3, pointRadius: 0, pointHitRadius: 10, borderWidth: 2,
-      }],
-    },
+    data: { labels, datasets },
     options: {
       responsive: true, maintainAspectRatio: false,
       interaction: { intersect: false, mode: "index" },
@@ -507,7 +847,9 @@ function renderChart(canvasId, snapshots, m, cur) {
           titleFont: { family: "'JetBrains Mono', monospace", size: 11 },
           bodyFont: { family: "'JetBrains Mono', monospace", size: 13 },
           padding: 10,
-          callbacks: { label: (c) => fmtMoney(c.parsed.y, cur, { digits: 2 }) },
+          callbacks: {
+            label: (c) => `${c.dataset.label}: ${fmtMoney(c.parsed.y, cur, { digits: 2 })}`,
+          },
         },
       },
       scales: {
@@ -589,15 +931,201 @@ function renderPanel(model, ledger) {
       through ${m.latestDate}); it just has not found a setup yet.</span>
     </div>`;
 
+  const choice = pickBenchmark(model, snapshots);
+  const overlay = benchmarkOverlay(snapshots, choice);
+
+  const legend = overlay ? `
+    <div class="legend">
+      <span><span class="swatch"></span>${model.name} equity</span>
+      <span><span class="swatch bench"></span>${overlay.label}, same capital</span>
+    </div>` : "";
+
   body.innerHTML = `
     ${flatNote}
+    ${legend}
     <div class="chart-wrap"><canvas id="chart-${model.key}"></canvas></div>
     ${renderMetricsHTML(m, model.currency)}
+    ${renderComparisonHTML(choice)}
     ${renderPositionsHTML(m.positions, model.currency)}
     <div class="last-updated">Last snapshot: ${m.latestDate}</div>`;
 
-  renderChart(`chart-${model.key}`, snapshots, m, model.currency);
+  renderChart(`chart-${model.key}`, snapshots, m, model.currency, overlay);
   return m;
+}
+
+// ===================================================
+// Benchmark section
+// ===================================================
+function benchSkeleton(card) {
+  return `
+    <div class="model-panel bench" id="panel-${card.panelKey}">
+      <div class="model-banner">
+        <span class="dot"></span>
+        <span class="name" id="name-${card.panelKey}">${card.key}</span>
+        <span class="ticker" id="ticker-${card.panelKey}"></span>
+        <span class="status-badge offline" id="badge-${card.panelKey}">…</span>
+      </div>
+      <div id="body-${card.panelKey}">
+        <div class="empty-state"><div class="icon">⏳</div>Loading…</div>
+      </div>
+    </div>`;
+}
+
+function renderBenchChart(canvasId, series) {
+  const ctx = document.getElementById(canvasId).getContext("2d");
+  const start = series[0].close;
+
+  new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: series.map(p => p.date),
+      datasets: [{
+        label: "Level", data: series.map(p => p.close),
+        borderColor: "#fbbf24",
+        backgroundColor: "rgba(251, 191, 36, 0.08)",
+        fill: true, tension: 0.3, pointRadius: 0, pointHitRadius: 10, borderWidth: 2,
+      }],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { intersect: false, mode: "index" },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: "#0f172a", borderColor: "#1e293b", borderWidth: 1,
+          titleFont: { family: "'JetBrains Mono', monospace", size: 11 },
+          bodyFont: { family: "'JetBrains Mono', monospace", size: 13 },
+          padding: 10,
+          callbacks: { label: (c) => c.parsed.y.toLocaleString(undefined, { maximumFractionDigits: 2 }) },
+        },
+      },
+      scales: {
+        x: {
+          ticks: { color: "#475569", font: { family: "'JetBrains Mono', monospace", size: 9 }, maxTicksLimit: 6 },
+          grid: { color: "rgba(30, 41, 59, 0.5)" }, border: { color: "#1e293b" },
+        },
+        y: {
+          ticks: {
+            color: "#475569", font: { family: "'JetBrains Mono', monospace", size: 9 },
+            callback: (v) => v.toLocaleString(undefined, { maximumFractionDigits: 0 }),
+          },
+          grid: { color: "rgba(30, 41, 59, 0.5)" }, border: { display: false },
+        },
+      },
+    },
+    plugins: [{
+      id: "bench-baseline",
+      afterDraw(chartObj) {
+        const y = chartObj.scales.y.getPixelForValue(start);
+        const c = chartObj.ctx;
+        c.save();
+        c.setLineDash([4, 4]);
+        c.strokeStyle = "#334155";
+        c.lineWidth = 1;
+        c.beginPath();
+        c.moveTo(chartObj.chartArea.left, y);
+        c.lineTo(chartObj.chartArea.right, y);
+        c.stroke();
+        c.restore();
+      },
+    }],
+  });
+}
+
+function renderBenchCard(card, windowStart) {
+  const bench = BENCHMARKS[card.key];
+  const badge = document.getElementById(`badge-${card.panelKey}`);
+  const body = document.getElementById(`body-${card.panelKey}`);
+  const nameEl = document.getElementById(`name-${card.panelKey}`);
+  const tickerEl = document.getElementById(`ticker-${card.panelKey}`);
+
+  if (!bench || !(bench.series || []).length) {
+    badge.className = "status-badge offline";
+    badge.textContent = "NO DATA";
+    body.innerHTML = `<div class="empty-state"><div class="icon">📡</div>
+      No series in ${BENCH_FILE}</div>`;
+    return;
+  }
+
+  nameEl.textContent = bench.name;
+  tickerEl.textContent = bench.symbol;
+
+  // Clip to the dashboard's own window so the index return is comparable to
+  // the models' — the proxy carries a year of history the models never saw.
+  const series = windowStart
+    ? bench.series.filter(p => p.date >= windowStart)
+    : bench.series;
+
+  if (bench.kind === "proxy") {
+    badge.className = "status-badge proxy";
+    badge.textContent = "PROXY";
+  } else {
+    badge.className = "status-badge";
+    badge.innerHTML = `<span class="pulse"></span>LIVE`;
+  }
+
+  const note = bench.note ? `<div class="bench-note">${bench.note}</div>` : "";
+
+  // One point is the steady state for ^CASE30 until the collector has run for
+  // a few sessions: show the level, not an empty chart.
+  if (series.length < 2) {
+    const last = bench.series[bench.series.length - 1];
+    badge.className = "status-badge flat";
+    badge.textContent = "ACCRUING";
+    body.innerHTML = `
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="label">Level</div>
+          <div class="value">${last.close.toLocaleString(undefined, { maximumFractionDigits: 2 })}</div>
+        </div>
+        <div class="metric-card">
+          <div class="label">As of</div>
+          <div class="value" style="font-size:12px">${last.date}</div>
+        </div>
+        <div class="metric-card">
+          <div class="label">Points</div>
+          <div class="value">${bench.series.length}</div>
+        </div>
+      </div>
+      ${note}`;
+    return;
+  }
+
+  const s = benchmarkStats(series);
+  const tiles = [
+    { label: "Level", value: s.level.toLocaleString(undefined, { maximumFractionDigits: 2 }), good: null },
+    { label: "Return", value: fmtPct(s.totalReturn), good: s.totalReturn >= 0 },
+    { label: "Sharpe", value: fmtNum(s.sharpe), good: s.sharpe > 1 },
+    { label: "Ann. vol", value: fmtPct(s.vol).replace("+", ""), good: null },
+    { label: "Max DD", value: `${s.maxDD.toFixed(2)}%`, good: s.maxDD < 10 },
+    { label: "Days", value: s.days, good: null },
+  ];
+
+  body.innerHTML = `
+    <div class="chart-wrap"><canvas id="chart-${card.panelKey}"></canvas></div>
+    <div class="metrics-grid">${tiles.map(t => `
+      <div class="metric-card">
+        <div class="label">${t.label}</div>
+        <div class="value ${t.good === null ? "" : t.good ? "up" : "down"}">${t.value}</div>
+      </div>`).join("")}</div>
+    ${note}
+    <div class="last-updated">${s.from} → ${s.to}</div>`;
+
+  renderBenchChart(`chart-${card.panelKey}`, series);
+}
+
+async function loadBenchmarks() {
+  try {
+    const resp = await fetch(rawUrl(BENCH_FILE), { cache: "no-store" });
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const store = await resp.json();
+    BENCHMARKS = store.benchmarks || {};
+    return store;
+  } catch (err) {
+    console.error("benchmarks", err);
+    BENCHMARKS = {};
+    return null;
+  }
 }
 
 function markOffline(model, reason) {
@@ -615,7 +1143,14 @@ async function init() {
   const sectionsEl = document.getElementById("sections");
 
   // Build the DOM skeleton first so panels appear immediately.
-  sectionsEl.innerHTML = SECTIONS.map(sec => `
+  sectionsEl.innerHTML = `
+    <div class="market-section">
+      <div class="section-title">
+        <span class="name">Benchmarks</span>
+        <span class="agg" id="agg-benchmarks"></span>
+      </div>
+      <div class="panels">${BENCH_CARDS.map(benchSkeleton).join("")}</div>
+    </div>` + SECTIONS.map(sec => `
     <div class="market-section">
       <div class="section-title">
         <span class="name">${sec.title}</span>
@@ -624,7 +1159,11 @@ async function init() {
       <div class="panels">${sec.models.map(panelSkeleton).join("")}</div>
     </div>`).join("");
 
+  // Benchmarks first: every model panel compares itself against them.
+  const benchStore = await loadBenchmarks();
+
   let usEquity = 0, usPnl = 0, haveUsData = false;
+  let windowStart = null;
 
   for (const sec of SECTIONS) {
     let secEquity = 0, secPnl = 0, secHasData = false;
@@ -634,6 +1173,9 @@ async function init() {
         const resp = await fetch(rawUrl(model.file), { cache: "no-store" });
         if (!resp.ok) { markOffline(model); continue; }
         const ledger = await resp.json();
+        const first = (ledger.snapshots || [])[0];
+        if (first && (!windowStart || first.date < windowStart)) windowStart = first.date;
+
         const m = renderPanel(model, ledger);
         if (m) {
           secEquity += m.equity;
@@ -663,6 +1205,30 @@ async function init() {
     const pnlEl = document.getElementById("total-pnl");
     pnlEl.textContent = fmtSigned(usPnl, USD);
     pnlEl.className = `value ${usPnl >= 0 ? "up" : "down"}`;
+  }
+
+  // Rendered after the ledgers so the index cards can be clipped to the same
+  // window the models have been running for.
+  for (const card of BENCH_CARDS) renderBenchCard(card, windowStart);
+
+  const benchAgg = document.getElementById("agg-benchmarks");
+  if (benchAgg) {
+    benchAgg.textContent = benchStore
+      ? `measured from ${windowStart || "series start"}` +
+        (benchStore.updated ? ` · updated ${benchStore.updated.slice(0, 10)}` : "")
+      : "benchmark series unavailable";
+  }
+
+  // The S&P 500 belongs next to the US total: same window, same question.
+  const sp = BENCHMARKS.SP500;
+  if (sp && (sp.series || []).length > 1) {
+    const clipped = windowStart ? sp.series.filter(p => p.date >= windowStart) : sp.series;
+    if (clipped.length > 1) {
+      const r = (clipped[clipped.length - 1].close / clipped[0].close - 1) * 100;
+      const el = document.getElementById("sp500-return");
+      el.textContent = fmtPct(r);
+      el.className = `value ${r >= 0 ? "up" : "down"}`;
+    }
   }
 }
 
