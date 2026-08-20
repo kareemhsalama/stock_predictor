@@ -4,7 +4,7 @@
   "market": "EGX",
   "currency": "EGP",
   "initial_budget": 1000000.0,
-  "cash": 428151.97843170166,
+  "cash": 570701.6008330015,
   "positions": {
     "PHDC.CA": {
       "qty": 8974,
@@ -14,10 +14,6 @@
       "qty": 1508,
       "avg_price": 99.38360148984928
     },
-    "COMI.CA": {
-      "qty": 1050,
-      "avg_price": 140.19381545880518
-    },
     "EFID.CA": {
       "qty": 3066,
       "avg_price": 31.889999389648438
@@ -26,6 +22,17 @@
       "qty": 582,
       "avg_price": 107.52999877929688
     }
+  },
+  "fees_paid": 106.9925,
+  "slippage_paid": 143.3851,
+  "cost_model_from": "2026-08-20",
+  "cost_model": {
+    "commission_bps": 5.0,
+    "min_commission": 10.0,
+    "stamp_duty_bps": 2.5,
+    "half_spread_bps": 10.0,
+    "impact_coef_bps": 100.0,
+    "max_participation": 0.2
   },
   "trade_log": [
     {
@@ -177,6 +184,20 @@
       "qty": 582,
       "price": 107.52999877929688,
       "cost": 62582.45928955078
+    },
+    {
+      "timestamp": "2026-08-20T13:29:10.336317+00:00",
+      "side": "SELL",
+      "symbol": "COMI.CA",
+      "qty": 1050,
+      "price": 135.8634,
+      "ref_price": 136.0,
+      "proceeds": 142549.6224,
+      "fees": 106.9925,
+      "slippage": 143.3851,
+      "pnl": -4653.8838,
+      "requested_qty": 1050,
+      "adv_known": true
     }
   ],
   "snapshots": [
@@ -1042,13 +1063,56 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-08-20",
+      "equity": 1022266.24,
+      "cash": 570701.6,
+      "pnl": 22266.24,
+      "positions": [
+        {
+          "symbol": "PHDC.CA",
+          "qty": 8974.0,
+          "avg_entry": 14.6956,
+          "current_price": 15.3,
+          "market_value": 137302.2,
+          "unrealized_pnl": 5423.67,
+          "side": "long"
+        },
+        {
+          "symbol": "TMGH.CA",
+          "qty": 1508.0,
+          "avg_entry": 99.3836,
+          "current_price": 97.0,
+          "market_value": 146276.0,
+          "unrealized_pnl": -3594.47,
+          "side": "long"
+        },
+        {
+          "symbol": "EFID.CA",
+          "qty": 3066.0,
+          "avg_entry": 31.89,
+          "current_price": 32.37,
+          "market_value": 99246.42,
+          "unrealized_pnl": 1471.68,
+          "side": "long"
+        },
+        {
+          "symbol": "SWDY.CA",
+          "qty": 582.0,
+          "avg_entry": 107.53,
+          "current_price": 118.11,
+          "market_value": 68740.02,
+          "unrealized_pnl": 6157.56,
+          "side": "long"
+        }
+      ]
     }
   ],
   "extra": {
     "peak_price": {
       "PHDC.CA": 15.680000305175781,
       "TMGH.CA": 99.9000015258789,
-      "COMI.CA": 141.5,
       "EFID.CA": 33.220001220703125,
       "SWDY.CA": 127.25
     },
