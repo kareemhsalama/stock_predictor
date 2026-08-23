@@ -4,11 +4,11 @@
   "market": "EGX",
   "currency": "EGP",
   "initial_budget": 1000000.0,
-  "cash": 570701.6008330015,
+  "cash": 431681.13099916966,
   "positions": {
     "PHDC.CA": {
-      "qty": 8974,
-      "avg_price": 14.695623824152248
+      "qty": 9773,
+      "avg_price": 14.73534423961825
     },
     "TMGH.CA": {
       "qty": 1508,
@@ -19,12 +19,16 @@
       "avg_price": 31.889999389648438
     },
     "SWDY.CA": {
-      "qty": 582,
+      "qty": 397,
       "avg_price": 107.52999877929688
+    },
+    "FWRY.CA": {
+      "qty": 7707,
+      "avg_price": 19.24391949806009
     }
   },
-  "fees_paid": 106.9925,
-  "slippage_paid": 143.3851,
+  "fees_paid": 247.2519,
+  "slippage_paid": 327.2829,
   "cost_model_from": "2026-08-20",
   "cost_model": {
     "commission_bps": 5.0,
@@ -197,6 +201,46 @@
       "slippage": 143.3851,
       "pnl": -4653.8838,
       "requested_qty": 1050,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-08-23T13:15:07.385967+00:00",
+      "side": "BUY",
+      "symbol": "PHDC.CA",
+      "qty": 799,
+      "price": 15.1652,
+      "ref_price": 15.15,
+      "cost": 12129.9911,
+      "fees": 13.0292,
+      "slippage": 12.1121,
+      "requested_qty": 799,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-08-23T13:15:07.386034+00:00",
+      "side": "BUY",
+      "symbol": "FWRY.CA",
+      "qty": 7707,
+      "price": 19.2295,
+      "ref_price": 19.21,
+      "cost": 148312.8876,
+      "fees": 111.1513,
+      "slippage": 150.2733,
+      "requested_qty": 7707,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-08-23T13:15:07.386059+00:00",
+      "side": "SELL",
+      "symbol": "SWDY.CA",
+      "qty": 185,
+      "price": 115.8837,
+      "ref_price": 116.0,
+      "proceeds": 21422.4088,
+      "fees": 16.0789,
+      "slippage": 21.5123,
+      "pnl": 1529.359,
+      "requested_qty": 185,
       "adv_known": true
     }
   ],
@@ -1104,6 +1148,59 @@
           "current_price": 118.11,
           "market_value": 68740.02,
           "unrealized_pnl": 6157.56,
+          "side": "long"
+        }
+      ]
+    },
+    {
+      "date": "2026-08-23",
+      "equity": 1020791.49,
+      "cash": 431681.13,
+      "pnl": 20791.49,
+      "positions": [
+        {
+          "symbol": "PHDC.CA",
+          "qty": 9773.0,
+          "avg_entry": 14.7353,
+          "current_price": 15.15,
+          "market_value": 148060.95,
+          "unrealized_pnl": 4052.43,
+          "side": "long"
+        },
+        {
+          "symbol": "TMGH.CA",
+          "qty": 1508.0,
+          "avg_entry": 99.3836,
+          "current_price": 97.7,
+          "market_value": 147331.6,
+          "unrealized_pnl": -2538.88,
+          "side": "long"
+        },
+        {
+          "symbol": "EFID.CA",
+          "qty": 3066.0,
+          "avg_entry": 31.89,
+          "current_price": 32.49,
+          "market_value": 99614.35,
+          "unrealized_pnl": 1839.61,
+          "side": "long"
+        },
+        {
+          "symbol": "SWDY.CA",
+          "qty": 397.0,
+          "avg_entry": 107.53,
+          "current_price": 116.0,
+          "market_value": 46052.0,
+          "unrealized_pnl": 3362.59,
+          "side": "long"
+        },
+        {
+          "symbol": "FWRY.CA",
+          "qty": 7707.0,
+          "avg_entry": 19.2439,
+          "current_price": 19.21,
+          "market_value": 148051.46,
+          "unrealized_pnl": -261.42,
           "side": "long"
         }
       ]
