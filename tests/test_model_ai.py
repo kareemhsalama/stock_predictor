@@ -294,6 +294,57 @@ def test_us_atr_stop_override_does_not_leak_into_egx():
     print("PASS test_us_atr_stop_override_does_not_leak_into_egx")
 
 
+def test_sector_cap_is_a_no_op_by_default():
+    """max_sector_weight=1.0 (the default) must not change inverse_vol_weights'
+    output at all, even with a sector_map present - the cap has to be
+    explicitly tightened below 1.0 to do anything."""
+    cfg = {**_test_config(), "max_weight": 1.0,
+          "sector_map": {"A": "S1", "B": "S1", "C": "S2"}}
+    selected = pd.DataFrame({"vol_20": [0.10, 0.20, 0.15]}, index=["A", "B", "C"])
+
+    without_map = model_ai.inverse_vol_weights(selected, {**cfg, "sector_map": None})
+    with_map_uncapped = model_ai.inverse_vol_weights(selected, cfg)
+    pd.testing.assert_series_equal(without_map, with_map_uncapped)
+    print("PASS test_sector_cap_is_a_no_op_by_default")
+
+
+def test_sector_cap_binds_a_concentrated_sleeve():
+    """
+    Two calm names in the same sector would otherwise dominate the sleeve;
+    a 60% sector cap (chosen so the OTHER sector has enough headroom to
+    absorb everything freed - with only 2 sectors, a cap tighter than 50%
+    each can't sum to 1.0 by construction, which is a separate, correctly-
+    tested degenerate case below) must bring S1 down to 60% and give the
+    freed weight to the third (different-sector) name.
+    """
+    cfg = {**_test_config(), "max_weight": 1.0, "max_sector_weight": 0.60,
+          "sector_map": {"A": "S1", "B": "S1", "C": "S2"}}
+    # A and B are both very calm (same sector) and would take ~95% combined
+    # under plain inverse-vol; C is noisier and would otherwise get ~5%.
+    selected = pd.DataFrame({"vol_20": [0.05, 0.06, 0.50]}, index=["A", "B", "C"])
+    w = model_ai.inverse_vol_weights(selected, cfg)
+
+    sector_total = w["A"] + w["B"]
+    assert sector_total <= 0.60 + 1e-6, f"sector S1 breached cap: {sector_total}"
+    assert abs(w.sum() - 1.0) < 1e-6, f"weights must still sum to 1, got {w.sum()}"
+    assert w["C"] > 0.05, f"C should have received the freed weight, got {w['C']}"
+    print(f"PASS test_sector_cap_binds_a_concentrated_sleeve (S1={sector_total:.2%}, C={w['C']:.2%})")
+
+
+def test_sector_cap_all_one_sector_leaves_cash_rather_than_breach():
+    """If every selected name shares one over-cap sector, there's nowhere to
+    redistribute freed weight to - the cap must still hold, with the
+    remainder going to cash (same philosophy as the per-name cap's own
+    documented degenerate case)."""
+    cfg = {**_test_config(), "max_weight": 1.0, "max_sector_weight": 0.40,
+          "sector_map": {"A": "S1", "B": "S1"}}
+    selected = pd.DataFrame({"vol_20": [0.10, 0.10]}, index=["A", "B"])
+    w = model_ai.inverse_vol_weights(selected, cfg)
+
+    assert w.sum() <= 0.40 + 1e-6, f"sector cap breached with nowhere to redistribute: {w.sum()}"
+    print(f"PASS test_sector_cap_all_one_sector_leaves_cash_rather_than_breach (sum={w.sum():.2%})")
+
+
 if __name__ == "__main__":
     failures = 0
     for name, fn in sorted(globals().items()):

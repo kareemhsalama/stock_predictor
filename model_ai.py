@@ -66,6 +66,20 @@ EGX_UNIVERSE = [
     "ORAS.CA", "PHDC.CA", "EFID.CA", "ABUK.CA", "SWDY.CA",
 ]
 
+# Redesign project, Tier 1 sector-concentration guard: with only 5 of 10
+# names held at once, an uncapped momentum book can end up 3+ names deep in
+# one sector (a real risk with no correlation/covariance data feed available
+# to catch it directly - see the redesign plan's Tier 2 item 8). Standard
+# EGX30 sector groupings, static and hand-classified (there is no sector
+# data feed in this repo to source them from automatically).
+EGX_SECTOR = {
+    "COMI.CA": "Financials", "HRHO.CA": "Financials", "FWRY.CA": "Financials",
+    "TMGH.CA": "RealEstate", "PHDC.CA": "RealEstate",
+    "EAST.CA": "Consumer", "EFID.CA": "Consumer",
+    "SWDY.CA": "Industrials", "ORAS.CA": "Industrials",
+    "ABUK.CA": "Materials",
+}
+
 CONFIG = {
     "universe_size":       50,     # cap after the liquidity ranking
     "n_positions":         8,      # 5 for EGX (see MARKET_DEFAULTS)
@@ -92,6 +106,8 @@ CONFIG = {
     "min_dollar_volume":   50_000_000,   # 20d average, market currency
     "regime_factors":      {"RISK_ON": 1.0, "NEUTRAL": 0.5, "RISK_OFF": 0.1},
     "regime_confirm_weeks": 1,   # 1 = off (raw regime, unchanged behavior)
+    "sector_map":          None,   # {ticker: sector}; None = no sector cap
+    "max_sector_weight":   1.0,    # 1.0 = off (no sector concentration cap)
 }
 
 MARKET_DEFAULTS = {
@@ -507,24 +523,91 @@ def select_names(feat: pd.DataFrame, cfg: dict) -> pd.DataFrame:
 # ============================================================
 # LAYER 3 - POSITION SIZING
 # ============================================================
+def _sector_capped(w: pd.Series, sector_map: dict[str, str], cap: float,
+                   max_iter: int = 20) -> pd.Series:
+    """
+    Cap every sector's total weight at `cap`, water-filling the freed weight
+    into sectors that still have headroom.
+
+    A naive "redistribute freed weight into everyone else" pass can push a
+    previously-fine sector over cap in turn, which then needs its own
+    capping pass, whose redistribution can re-breach the FIRST sector -
+    an oscillation that never converges. This avoids that by giving each
+    under-cap sector strictly no more than its own headroom (cap minus its
+    current total) per pass, so no pass can ever create a new breach.
+
+    If every selected name shares one over-cap sector, there's no headroom
+    anywhere and the freed weight is left as cash - same degenerate-case
+    philosophy as the per-name cap (test_cap_below_full_allocation_leaves_cash).
+    """
+    w = w.copy()
+    sectors = pd.Series({t: sector_map.get(t, "UNKNOWN") for t in w.index})
+
+    for _ in range(max_iter):
+        totals = w.groupby(sectors).sum()
+        over = totals[totals > cap + 1e-12]
+        if over.empty:
+            break
+
+        freed = 0.0
+        for sec, total in over.items():
+            names = sectors[sectors == sec].index
+            freed += total - cap
+            w[names] = w[names] * (cap / total)
+
+        totals_after = w.groupby(sectors).sum()
+        headroom = (cap - totals_after).clip(lower=0)
+        headroom = headroom[~headroom.index.isin(over.index)]
+        total_headroom = float(headroom.sum())
+        if total_headroom <= 0 or freed <= 0:
+            break   # nowhere left to put it - leaves the rest as cash
+
+        give = min(freed, total_headroom)
+        for sec, room in headroom.items():
+            if room <= 0:
+                continue
+            share = give * (room / total_headroom)
+            names = sectors[sectors == sec].index
+            sec_total = w[names].sum()
+            if sec_total > 0:
+                w[names] += share * w[names] / sec_total
+            else:
+                w[names] += share / len(names)
+
+    return w
+
+
 def inverse_vol_weights(selected: pd.DataFrame, cfg: dict) -> pd.Series:
-    """Risk parity within the sleeve, capped and renormalized."""
+    """Risk parity within the sleeve, capped (per-name and, optionally,
+    per-sector) and renormalized."""
     raw = 1.0 / selected["vol_20"]
     w = raw / raw.sum()
 
     cap = cfg["max_weight"]
+    sector_map = cfg.get("sector_map")
+    sector_cap = cfg.get("max_sector_weight", 1.0)
+
     # Iterate: capping frees weight that renormalization pushes back onto other
-    # names, which can push THEM over the cap. Converges in a few passes.
+    # names, which can push THEM (or their sector) over a cap. Converges in a
+    # few passes - both caps are applied every pass so neither one's fix can
+    # silently break the other.
     for _ in range(10):
+        before = w.copy()
+
         over = w > cap
-        if not over.any():
+        if over.any():
+            excess = (w[over] - cap).sum()
+            w[over] = cap
+            under = ~over
+            if under.any() and w[under].sum() > 0:
+                w[under] += excess * w[under] / w[under].sum()
+
+        if sector_map and sector_cap < 1.0:
+            w = _sector_capped(w, sector_map, sector_cap)
+
+        if (w - before).abs().max() < 1e-9:
             break
-        excess = (w[over] - cap).sum()
-        w[over] = cap
-        under = ~over
-        if not under.any() or w[under].sum() == 0:
-            break
-        w[under] += excess * w[under] / w[under].sum()
+
     return w.clip(upper=cap)
 
 
