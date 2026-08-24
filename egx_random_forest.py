@@ -106,22 +106,35 @@ def predict_signal(ticker):
         adv_value = None
 
     data = engineer_features(data)
-    # EGX has zero-volume days, so volume-based ratios can yield ±inf; drop
+    # EGX has zero-volume days, so volume-based ratios can yield ±inf; clean
     # those alongside the warm-up NaNs before training.
-    data = data.replace([np.inf, -np.inf], np.nan).dropna()
-    if len(data) < 50:
-        print(f"[{ticker}] only {len(data)} usable rows — skipping")
+    clean = data.replace([np.inf, -np.inf], np.nan)
+
+    # Capture today's row before the Target-driven dropna below. Target's
+    # Tomorrow_Return (shift(-1)) is NaN on the most recent row by
+    # construction - tomorrow hasn't happened - so a plain dropna() always
+    # drops it, and `today` was silently coming from yesterday's row instead
+    # on every run. If today's own features are NaN/inf (e.g. a zero-volume
+    # session), skip rather than silently substitute an older row.
+    today = clean[FEATURES].iloc[[-1]]
+    if today.isna().any(axis=None):
+        print(f"[{ticker}] today's features contain NaN/inf — skipping")
         return None, last_close, adv_value
 
-    # Train on everything except the final (still-open) row, exactly like
-    # live_trader.py: the last row's Target is unknown until tomorrow.
-    x = data[FEATURES].iloc[:-1]
-    y = data["Target"].iloc[:-1]
+    train = clean.dropna()
+    if len(train) < 50:
+        print(f"[{ticker}] only {len(train)} usable rows — skipping")
+        return None, last_close, adv_value
+
+    # dropna() above already removes the one row with an unknown Target (the
+    # row captured as `today`), so every remaining row is fully labelled -
+    # no further trimming needed.
+    x = train[FEATURES]
+    y = train["Target"]
 
     model = RandomForestClassifier(n_estimators=100, max_depth=5, random_state=42)
     model.fit(x, y)
 
-    today = data[FEATURES].iloc[[-1]]
     confidence = float(model.predict_proba(today)[0, 1])
     adv_note = f"{adv_value:,.0f} EGP" if adv_value else "unknown"
     print(f"[{ticker}] confidence = {confidence:.1%} | last close = "

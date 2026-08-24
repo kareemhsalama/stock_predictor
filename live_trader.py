@@ -57,22 +57,32 @@ def live_trade(ticker, threshold=0.55, risk_pct=0.10):
     data["Volume_vs_avg"] = data["Volume"]/data["Volume"].rolling(20).mean()
     data["Day_of_week"] = data.index.dayofweek
 
+    features = ["Return", "Momentum_5", "Momentum_10", "Momentum_20", "Volatility", "RSI", "Price_vs_MA", "Volume_Change", "MA_cross", "Distance_from_high", "Volatility_change", "Bollinger_position", "Volume_vs_avg", "Day_of_week"]
+
+    # Capture today's row and price before the Target-driven dropna below.
+    # Tomorrow_Return (shift(-1)) is NaN on the most recent row by
+    # construction - tomorrow hasn't happened - so a plain dropna() always
+    # drops it, and today/curr_price were silently coming from yesterday's
+    # row instead on every run.
+    today = data[features].iloc[[-1]].replace([float("inf"), float("-inf")], float("nan"))
+    if today.isna().any(axis=None):
+        print(f"{ticker}: today's features contain NaN/inf - skipping")
+        return
+    curr_price = float(data["Close"].iloc[-1])
+
     data["Tomorrow_Return"] = data["Close"].shift(-1).div(data["Close"]).sub(1)
-    data["Target"] = data["Tomorrow_Return"] > 0 
+    data["Target"] = data["Tomorrow_Return"] > 0
     data["Target"] = data["Target"].astype(int)
     data = data.dropna()
 
-    features = ["Return", "Momentum_5", "Momentum_10", "Momentum_20", "Volatility", "RSI", "Price_vs_MA", "Volume_Change", "MA_cross", "Distance_from_high", "Volatility_change", "Bollinger_position", "Volume_vs_avg", "Day_of_week"]
+    # dropna() above already removes the one row with an unknown Target (the
+    # row captured as `today`), so every remaining row is fully labelled -
+    # no further trimming needed.
     x = data[features]
     y = data["Target"]
 
-    x = x.iloc[:-1]
-    y = y.iloc[:-1]
-
-    model = RandomForestClassifier(n_estimators=100, max_depth=5, random_state=42)    
+    model = RandomForestClassifier(n_estimators=100, max_depth=5, random_state=42)
     model.fit(x, y)
-
-    today = data[features].iloc[[-1]]
 
     confidence = model.predict_proba(today)[0,1]
     print(f"{ticker}: Model confidence = {confidence:.1%}")
@@ -90,7 +100,6 @@ def live_trade(ticker, threshold=0.55, risk_pct=0.10):
     if confidence > threshold and not already_own:
         av_cash = float(client.get_account().cash)
         spend = av_cash * risk_pct
-        curr_price = float(data["Close"].iloc[-1])
         quantity = int(spend / curr_price)
         if quantity > 0:
             order = MarketOrderRequest(
@@ -127,9 +136,10 @@ def live_trade(ticker, threshold=0.55, risk_pct=0.10):
     print(f"Portfolio:  ${float(client.get_account().portfolio_value):,.2f}")
 
 
-tickers = ["AAPL", "MSFT", "GOOGL", "TSLA", "NVDA"]
-for t in tickers:
-    try:
-        live_trade(t)
-    except Exception as e:
-        print(f"Error with {t}: {e}")
+if __name__ == "__main__":
+    tickers = ["AAPL", "MSFT", "GOOGL", "TSLA", "NVDA"]
+    for t in tickers:
+        try:
+            live_trade(t)
+        except Exception as e:
+            print(f"Error with {t}: {e}")
