@@ -23,17 +23,17 @@
       "entry_date": "2026-08-10",
       "peak_price": 1265.76
     },
-    "GE": {
-      "entry_date": "2026-08-17",
-      "peak_price": 371.86
-    },
     "RTX": {
       "entry_date": "2026-08-17",
       "peak_price": 223.60000610351562
     },
-    "CAT": {
-      "entry_date": "2026-08-17",
-      "peak_price": 882.19
+    "TMO": {
+      "entry_date": "2026-08-24",
+      "peak_price": 618.4000244140625
+    },
+    "AMGN": {
+      "entry_date": "2026-08-24",
+      "peak_price": 440.3299865722656
     }
   }
 }
