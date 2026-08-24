@@ -1,0 +1,48 @@
+name: Tests
+
+# Runs the tests/ suite on every push and PR. Nothing else in this repo did
+# this before — the suite existed but nothing ever executed it, so a
+# regression a test would have caught could still ship silently.
+
+on:
+  push:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Run tests
+        env:
+          # live_trader.py constructs a TradingClient at import time, which
+          # raises if both keys are unset - CI has no .env and doesn't need
+          # real broker credentials just to import the module and run tests.
+          ALPACA_API_KEY: test-key
+          ALPACA_SECRET_KEY: test-secret
+        run: |
+          pytest tests/ -v --tb=long 2>&1 | tee pytest_output.txt
+          exit ${PIPESTATUS[0]}
+
+      - name: Publish results to job summary
+        if: always()
+        run: |
+          { echo '### pytest tests/ -v'; echo '```'; cat pytest_output.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
