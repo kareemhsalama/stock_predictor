@@ -102,6 +102,16 @@ MARKET_DEFAULTS = {
         "sigma_target": 0.12,
         "min_dollar_volume": 50_000_000,
         "allow_short": False,
+        # Redesign project, Tier 1 finding (research/trials.jsonl): the base
+        # 3.0x multiplier was tight enough to whipsaw daily volatility and
+        # stop out of names before their momentum played out. A sweep from
+        # 3.0->8.0 (in-sample, both markets excluded from the holdout) shows
+        # a smooth, non-isolated-spike improvement through 5.0x, which
+        # strictly dominates the 3.0x baseline: Sharpe 0.74->0.95, Sortino
+        # 0.89->1.19, Calmar 0.42->0.83, AND max drawdown improves
+        # -19.2%->-13.9% (not a risk-for-return tradeoff). Scoped to US only
+        # - EGX was not swept at this value and keeps the base 3.0x default.
+        "atr_stop_mult": 5.0,
     },
     "EGX": {
         "universe": EGX_UNIVERSE,

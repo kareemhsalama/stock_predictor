@@ -280,6 +280,20 @@ def test_regime_confirm_weeks_preserves_no_lookahead():
     print("PASS test_regime_confirm_weeks_preserves_no_lookahead")
 
 
+def test_us_atr_stop_override_does_not_leak_into_egx():
+    """
+    The Tier 1 ATR-multiplier fix (research/trials.jsonl) was evidence-tested
+    for US only - EGX must still get the global CONFIG default (3.0), not
+    US's tuned override, until EGX is separately tested at this value.
+    """
+    us_cfg = model_ai.market_config("US")
+    egx_cfg = model_ai.market_config("EGX")
+    assert us_cfg["atr_stop_mult"] == 5.0, us_cfg["atr_stop_mult"]
+    assert egx_cfg["atr_stop_mult"] == model_ai.CONFIG["atr_stop_mult"] == 3.0, \
+        egx_cfg["atr_stop_mult"]
+    print("PASS test_us_atr_stop_override_does_not_leak_into_egx")
+
+
 if __name__ == "__main__":
     failures = 0
     for name, fn in sorted(globals().items()):
