@@ -414,6 +414,124 @@ def test_ensemble_lookbacks_changes_the_ranking():
     print("PASS test_ensemble_lookbacks_changes_the_ranking")
 
 
+def test_use_covariance_sizing_default_is_a_no_op():
+    """use_covariance_sizing=False (the default) must leave
+    generate_target_weights byte-identical to before this feature existed."""
+    data = _synthetic_panel()
+    cfg = _test_config()
+    assert cfg.get("use_covariance_sizing") is False
+
+    off = model_ai.generate_target_weights(
+        data.close.index[-1], "US", cfg, data, verbose=False)
+    explicit_off = model_ai.generate_target_weights(
+        data.close.index[-1], "US", {**cfg, "use_covariance_sizing": False}, data, verbose=False)
+    assert off == explicit_off
+    print("PASS test_use_covariance_sizing_default_is_a_no_op")
+
+
+def test_risk_parity_falls_back_with_too_little_history():
+    """Fewer trailing bars than risk_parity_weights' own window//2 threshold
+    must fall back to plain inverse_vol_weights, not error or produce NaN."""
+    dates = pd.bdate_range("2024-01-01", periods=10)
+    close = pd.DataFrame({"A": np.linspace(100, 101, 10),
+                          "B": np.linspace(50, 49, 10)}, index=dates)
+    data = model_ai.PriceData(close=close, high=close * 1.01, low=close * 0.99,
+                              volume=pd.DataFrame(1e6, index=dates, columns=["A", "B"]),
+                              benchmark=close.mean(axis=1), benchmark_name="TEST")
+    selected = pd.DataFrame({"vol_20": [0.10, 0.20]}, index=["A", "B"])
+    cfg = _test_config()
+
+    w = model_ai.risk_parity_weights(selected, data, cfg, window=60)
+    expected = model_ai.inverse_vol_weights(selected, cfg)
+    pd.testing.assert_series_equal(w.sort_index(), expected.sort_index())
+    print("PASS test_risk_parity_falls_back_with_too_little_history")
+
+
+def test_risk_parity_equalizes_risk_contribution_on_correlated_names():
+    """
+    The point of ERC sizing: two HIGHLY correlated, similar-vol names should
+    each get sized DOWN relative to plain inverse-vol (which is blind to
+    their shared risk), while a genuinely diversifying (uncorrelated) third
+    name should get sized UP - and the resulting risk contributions
+    (w_i * (Cov @ w)_i) should be much closer to equal across all three
+    names than they are under naive inverse-vol.
+    """
+    n = 300
+    dates = pd.bdate_range("2023-01-01", periods=n)
+    rng = np.random.default_rng(42)
+
+    shared_factor = rng.normal(0, 0.01, n)
+    idio = rng.normal(0, 0.003, size=(n, 3))
+    # A and B share the same underlying factor (highly correlated, similar
+    # vol); C is independent noise (uncorrelated, similar vol to A/B).
+    rets = pd.DataFrame({
+        "A": shared_factor + idio[:, 0],
+        "B": shared_factor + idio[:, 1],
+        "C": rng.normal(0, 0.011, n),
+    }, index=dates)
+    close = 100 * (1 + rets).cumprod()
+
+    data = model_ai.PriceData(
+        close=close, high=close * 1.005, low=close * 0.995,
+        volume=pd.DataFrame(5e6, index=dates, columns=close.columns),
+        benchmark=close.mean(axis=1), benchmark_name="TEST")
+
+    # Full-sample vol (not a noisy 20-day tail) so naive and ERC are fed a
+    # CONSISTENT volatility measurement, matching the covariance window used
+    # below - a 20-day-vs-250-day mismatch would let short-window noise (not
+    # the correlation-awareness actually under test) decide the comparison.
+    vol_full = rets.std() * np.sqrt(model_ai.TRADING_DAYS)
+    selected = pd.DataFrame({"vol_20": vol_full})
+    cfg = {**_test_config(), "max_weight": 1.0}   # cap out of the way for this check
+
+    naive = model_ai.inverse_vol_weights(selected, cfg)
+    erc = model_ai.risk_parity_weights(selected, data, cfg, window=250)
+
+    assert abs(erc.sum() - 1.0) < 1e-6, f"ERC weights must sum to 1, got {erc.sum()}"
+    assert erc["C"] > naive["C"], (
+        f"uncorrelated diversifier C should get MORE weight under ERC than "
+        f"naive inverse-vol: erc={erc['C']:.3f} naive={naive['C']:.3f}"
+    )
+    assert (erc["A"] + erc["B"]) < (naive["A"] + naive["B"]), (
+        f"correlated pair A+B should get LESS combined weight under ERC: "
+        f"erc={erc['A']+erc['B']:.3f} naive={naive['A']+naive['B']:.3f}"
+    )
+
+    rets_recent = data.close[list(selected.index)].pct_change().tail(250)
+    cov = rets_recent.cov().to_numpy()
+    for label, w in [("naive", naive), ("erc", erc)]:
+        wv = w.reindex(selected.index).to_numpy()
+        rc = wv * (cov @ wv)
+        spread = rc.max() - rc.min()
+        print(f"  {label} risk-contribution spread: {spread:.6f} (rc={rc})")
+        if label == "naive":
+            naive_spread = spread
+        else:
+            erc_spread = spread
+    assert erc_spread < naive_spread, (
+        f"ERC should equalize risk contributions more than naive inverse-vol: "
+        f"erc_spread={erc_spread:.6f} >= naive_spread={naive_spread:.6f}"
+    )
+    print("PASS test_risk_parity_equalizes_risk_contribution_on_correlated_names")
+
+
+def test_covariance_sizing_preserves_no_lookahead():
+    """Same invariant as test_no_lookahead, through the covariance-sizing path."""
+    full = _synthetic_panel(n_days=900)
+    cfg = {**_test_config(), "use_covariance_sizing": True}
+
+    for offset in (0, 30, 90):
+        as_of = full.close.index[-1 - offset]
+        truncated = model_ai._slice(full, as_of)
+
+        from_full = model_ai.generate_target_weights(as_of, "US", cfg, full, verbose=False)
+        from_trunc = model_ai.generate_target_weights(as_of, "US", cfg, truncated, verbose=False)
+        assert from_full == from_trunc, (
+            f"LOOK-AHEAD in covariance sizing at {as_of.date()}: "
+            f"{from_full} != {from_trunc}")
+    print("PASS test_covariance_sizing_preserves_no_lookahead")
+
+
 if __name__ == "__main__":
     failures = 0
     for name, fn in sorted(globals().items()):

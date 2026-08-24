@@ -109,6 +109,7 @@ CONFIG = {
     "sector_map":          None,   # {ticker: sector}; None = no sector cap
     "max_sector_weight":   1.0,    # 1.0 = off (no sector concentration cap)
     "ensemble_lookbacks":  None,   # e.g. [(126,21),(252,21),(252,63)]; None = off
+    "use_covariance_sizing": False,   # False = inverse_vol_weights (unchanged)
 }
 
 MARKET_DEFAULTS = {
@@ -617,20 +618,23 @@ def _sector_capped(w: pd.Series, sector_map: dict[str, str], cap: float,
     return w
 
 
-def inverse_vol_weights(selected: pd.DataFrame, cfg: dict) -> pd.Series:
-    """Risk parity within the sleeve, capped (per-name and, optionally,
-    per-sector) and renormalized."""
-    raw = 1.0 / selected["vol_20"]
-    w = raw / raw.sum()
+def _apply_caps(w: pd.Series, cfg: dict) -> pd.Series:
+    """
+    Iteratively apply the per-name max_weight cap and, if configured, the
+    per-sector max_sector_weight cap - shared by every sizing method
+    (inverse_vol_weights, risk_parity_weights) so a sizing method can never
+    bypass the concentration guardrails the others already respect.
 
+    Converges in a few passes: capping one frees weight that renormalization
+    pushes onto others, which can push THEM (or their sector) over a cap.
+    Both caps are re-applied every pass so neither one's fix can silently
+    break the other.
+    """
     cap = cfg["max_weight"]
     sector_map = cfg.get("sector_map")
     sector_cap = cfg.get("max_sector_weight", 1.0)
+    w = w.copy()
 
-    # Iterate: capping frees weight that renormalization pushes back onto other
-    # names, which can push THEM (or their sector) over a cap. Converges in a
-    # few passes - both caps are applied every pass so neither one's fix can
-    # silently break the other.
     for _ in range(10):
         before = w.copy()
 
@@ -649,6 +653,88 @@ def inverse_vol_weights(selected: pd.DataFrame, cfg: dict) -> pd.Series:
             break
 
     return w.clip(upper=cap)
+
+
+def inverse_vol_weights(selected: pd.DataFrame, cfg: dict) -> pd.Series:
+    """Risk parity (naive, per-name-independent - see risk_parity_weights()
+    for the covariance-aware alternative) within the sleeve, capped
+    (per-name and, optionally, per-sector) and renormalized."""
+    raw = 1.0 / selected["vol_20"]
+    w = raw / raw.sum()
+    return _apply_caps(w, cfg)
+
+
+def _shrunk_covariance(rets: pd.DataFrame, shrinkage: float = 0.2) -> np.ndarray:
+    """
+    Sample covariance of `rets` (columns = selected tickers), shrunk toward
+    its own diagonal. With only 5-8 names and a 60-90 day window, the raw
+    sample covariance is poorly conditioned - a small fixed shrinkage
+    (Ledoit-Wolf-style regularization, without the full optimal-shrinkage
+    estimation machinery) keeps it well-behaved for the risk-parity solve
+    below without adding a new dependency.
+    """
+    cov = rets.cov().to_numpy()
+    diag = np.diag(np.diag(cov))
+    return (1 - shrinkage) * cov + shrinkage * diag
+
+
+def risk_parity_weights(selected: pd.DataFrame, data: PriceData, cfg: dict,
+                        window: int = 60, shrinkage: float = 0.2,
+                        max_iter: int = 200) -> pd.Series:
+    """
+    Equal-risk-contribution sizing over the selected sleeve's trailing
+    covariance - the covariance-aware alternative to inverse_vol_weights().
+
+    inverse_vol_weights() sizes each name from its OWN vol_20 in isolation,
+    with no awareness of how correlated the selected names are - and a
+    cross-sectional momentum sleeve clusters by construction (a rally pulls
+    correlated names into the top-N together), so risk can concentrate in a
+    correlated cluster even after volatility_scalar() correctly targets
+    aggregate portfolio vol (that layer measures realized PORTFOLIO vol
+    correctly; the gap is one layer up, in how the sleeve itself is split).
+    This targets each name's CONTRIBUTION to portfolio risk directly instead,
+    via the standard fixed-point ERC iteration (Maillard/Roncalli-style):
+    scale each weight inversely to its current risk contribution, renormalize,
+    repeat until contributions equalize.
+
+    Falls back to inverse_vol_weights() whenever the covariance solve isn't
+    trustworthy (too few names, too little history, a non-finite matrix, or
+    a risk contribution going non-positive mid-iteration) - a cold start or
+    thin data degrades to the existing, already-validated sizing rather than
+    to something untested.
+    """
+    tickers = list(selected.index)
+    n = len(tickers)
+    if n < 2:
+        return inverse_vol_weights(selected, cfg)
+
+    rets = data.close[tickers].pct_change().tail(window)
+    if len(rets.dropna(how="all")) < window // 2 or rets.isna().any().any():
+        return inverse_vol_weights(selected, cfg)
+
+    cov = _shrunk_covariance(rets, shrinkage)
+    if not np.all(np.isfinite(cov)):
+        return inverse_vol_weights(selected, cfg)
+
+    w = np.full(n, 1.0 / n)
+    for _ in range(max_iter):
+        port_var = float(w @ cov @ w)
+        if not np.isfinite(port_var) or port_var <= 0:
+            return inverse_vol_weights(selected, cfg)
+        marginal = cov @ w
+        rc = w * marginal
+        if np.any(rc <= 0) or not np.all(np.isfinite(rc)):
+            return inverse_vol_weights(selected, cfg)
+        target = port_var / n
+        w_new = w * (target / rc)
+        w_new = np.clip(w_new, 1e-6, None)
+        w_new = w_new / w_new.sum()
+        if np.max(np.abs(w_new - w)) < 1e-8:
+            w = w_new
+            break
+        w = w_new
+
+    return _apply_caps(pd.Series(w, index=tickers), cfg)
 
 
 def volatility_scalar(weights: pd.Series, data: PriceData, cfg: dict) -> tuple[float, float]:
@@ -705,7 +791,10 @@ def generate_target_weights(as_of_date, market: str, config: dict | None = None,
             print("[select] no eligible names (trend gate / liquidity) — cash")
         return {}
 
-    weights = inverse_vol_weights(selected, cfg)
+    if cfg.get("use_covariance_sizing"):
+        weights = risk_parity_weights(selected, d, cfg)
+    else:
+        weights = inverse_vol_weights(selected, cfg)
 
     conviction = 1.0
     if cfg.get("use_meta_label"):
