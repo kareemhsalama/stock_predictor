@@ -206,6 +206,24 @@ def test_random_portfolio_bootstrap_respects_holdout_and_shape():
     assert len(null["sharpes"]) > 0, "no draws produced a usable Sharpe at all"
     assert null["sharpe_mean"] is not None
 
+    # The actual holdout check: default (allow_holdout=False) must never use
+    # a rebalance date on or after HOLDOUT_START, and allow_holdout=True must
+    # actually reach past it - otherwise this "guard" is unverified by
+    # anything in this test (a prior version of this test asserted shape/
+    # determinism only, and would have passed even with the holdout slice
+    # in random_portfolio_bootstrap deleted entirely).
+    assert null["last_date"] is not None
+    assert null["last_date"] < pd.Timestamp(bt.HOLDOUT_START), (
+        f"default run's last rebalance date leaked into the holdout: "
+        f"{null['last_date'].date()}"
+    )
+    full = bt.random_portfolio_bootstrap("US", config=cfg, data=panel, n_draws=20,
+                                         seed=1, allow_holdout=True)
+    assert full["last_date"] >= pd.Timestamp(bt.HOLDOUT_START), (
+        "allow_holdout=True did not actually reach the holdout period - "
+        "the guard isn't proven to be doing anything"
+    )
+
     # Determinism: same seed -> identical distribution.
     again = bt.random_portfolio_bootstrap("US", config=cfg, data=panel, n_draws=20, seed=1)
     assert null["sharpes"] == again["sharpes"], "same seed produced a different draw"
@@ -233,25 +251,31 @@ def test_atr_trailing_stop_reduces_drawdown_when_tightened():
     A much tighter ATR multiplier must produce a shallower (or equal) max
     drawdown than a much looser one - if it doesn't, the ATR stop added to
     run_backtest() isn't actually constraining the loop, it's decorative.
+
+    Checked across several independent synthetic panels (not just one seed)
+    per a Phase 6 review note: a single-seed pass here couldn't rule out the
+    result being a seed-specific artifact rather than the stop genuinely
+    constraining drawdown in general.
     """
-    panel = _synthetic_panel(n_days=1400, n_tickers=15, seed=23)
     cfg = _config()
+    for seed in (23, 1, 2, 3, 4, 5, 42, 99):
+        panel = _synthetic_panel(n_days=1400, n_tickers=15, seed=seed)
 
-    tight = bt.run_backtest("US", config={**cfg, "atr_stop_mult": 0.5},
-                            data=panel, verbose=False)
-    loose = bt.run_backtest("US", config={**cfg, "atr_stop_mult": 100.0},
-                            data=panel, verbose=False)
+        tight = bt.run_backtest("US", config={**cfg, "atr_stop_mult": 0.5},
+                                data=panel, verbose=False)
+        loose = bt.run_backtest("US", config={**cfg, "atr_stop_mult": 100.0},
+                                data=panel, verbose=False)
 
-    assert tight["stats"]["max_dd"] >= loose["stats"]["max_dd"], (
-        f"tight ATR stop drawdown ({tight['stats']['max_dd']:.2%}) is WORSE "
-        f"than a loose one's ({loose['stats']['max_dd']:.2%}) - the stop "
-        f"isn't actually constraining drawdown"
-    )
-    assert tight["returns"].to_numpy().tolist() != loose["returns"].to_numpy().tolist(), (
-        "tight vs. loose ATR multiplier produced identical return series - "
-        "the stop appears to be a no-op"
-    )
-    print("PASS test_atr_trailing_stop_reduces_drawdown_when_tightened")
+        assert tight["stats"]["max_dd"] >= loose["stats"]["max_dd"], (
+            f"seed={seed}: tight ATR stop drawdown ({tight['stats']['max_dd']:.2%}) "
+            f"is WORSE than a loose one's ({loose['stats']['max_dd']:.2%}) - the "
+            f"stop isn't actually constraining drawdown"
+        )
+        assert tight["returns"].to_numpy().tolist() != loose["returns"].to_numpy().tolist(), (
+            f"seed={seed}: tight vs. loose ATR multiplier produced identical "
+            f"return series - the stop appears to be a no-op"
+        )
+    print("PASS test_atr_trailing_stop_reduces_drawdown_when_tightened (8 seeds)")
 
 
 if __name__ == "__main__":

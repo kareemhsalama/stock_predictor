@@ -413,10 +413,15 @@ def random_portfolio_bootstrap(market: str, period: str = "8y",
         if len(downside) > 1 and downside.std() > 0:
             sortinos.append(float(r.mean() / downside.std() * np.sqrt(periods_per_year)))
 
+    last_date = dates[rebalance_idx[-1]] if rebalance_idx else None
     return {"market": market, "n_draws": n_draws,
             "sharpe_mean": float(np.mean(sharpes)) if sharpes else None,
             "sharpe_std": float(np.std(sharpes)) if sharpes else None,
-            "sharpes": sharpes, "sortinos": sortinos}
+            "sharpes": sharpes, "sortinos": sortinos,
+            # Last rebalance date actually used - lets a caller (and the
+            # holdout-guard test) verify the guard above actually bit,
+            # rather than trusting it by inspection alone.
+            "last_date": last_date}
 
 
 def percentile_of(value: float, distribution: list[float]) -> float:

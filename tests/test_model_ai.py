@@ -376,25 +376,54 @@ def test_ensemble_lookbacks_preserves_no_lookahead():
 
 
 def test_ensemble_lookbacks_changes_the_ranking():
-    """Sanity check that ensembling isn't silently a no-op in practice: on a
+    """
+    Sanity check that ensembling isn't silently a no-op in practice: on a
     panel where different lookback windows disagree, the ensembled ranking
-    must differ from the single-window ranking for at least one name."""
+    must differ from the single-window ranking.
+
+    mom_12_1 is a pure two-point ratio (price[t-skip]/price[t-long_lb] - 1),
+    NOT path-integrated - so a naive "one name rallies early, the other
+    rallies late" construction does NOT reliably flip rank order between
+    window lengths (both windows can fully bracket either rally and see
+    similar momentum). What actually flips the ranking: two names with the
+    IDENTICAL total move over the LONG window (a dead tie there) whose move
+    is split differently across time - one mostly BEFORE the short window
+    even starts, one mostly INSIDE it. The long window can't tell them
+    apart; the short window clearly favors whichever one's move happened
+    more recently, and the ensembled average of both should then diverge
+    from the single (long-only) ranking.
+    """
     n = 400
     dates = pd.bdate_range("2021-01-01", periods=n)
-    tickers = ["EARLY_WINNER", "LATE_WINNER", "FLAT"]
+    tickers = ["STEADY", "BACKLOADED"]
     rng = np.random.default_rng(5)
 
-    # EARLY_WINNER rallied hard early then went flat (favoured by a longer
-    # lookback); LATE_WINNER was flat then rallied hard recently (favoured
-    # by a shorter lookback) - a single window ranks these very differently
-    # depending on which window is used; an average should land between them.
-    early = np.concatenate([np.linspace(0, 0.6, n // 2), np.full(n - n // 2, 0.6)])
-    late = np.concatenate([np.full(n // 2, 0.0), np.linspace(0, 0.6, n - n // 2)])
-    flat = np.zeros(n)
+    # Long window spans roughly [day 147, day 378]; short window spans
+    # roughly [day 273, day 378] (378-21-252=105->147, 378-21-126=231->273,
+    # for n=400, skip=21, long_lb=252, short components below use the same
+    # arithmetic). Both tickers move by the same TOTAL log-return (0.40)
+    # over the long window (tying it), but STEADY does 0.35 of that BEFORE
+    # day 273 (outside the short window) and only 0.05 inside it, while
+    # BACKLOADED does the reverse (0.05 before, 0.35 inside) - so the short
+    # window alone clearly favors BACKLOADED.
+    logp = {"STEADY": np.zeros(n), "BACKLOADED": np.zeros(n)}
+    for d in range(n):
+        if d < 147:
+            s, b = 0.0, 0.0
+        elif d < 273:
+            frac = (d - 147) / (273 - 147)
+            s, b = 0.35 * frac, 0.05 * frac
+        elif d < 379:
+            frac = (d - 273) / (379 - 273)
+            s, b = 0.35 + 0.05 * frac, 0.05 + 0.35 * frac
+        else:
+            s, b = 0.40, 0.40
+        logp["STEADY"][d], logp["BACKLOADED"][d] = s, b
+
+    noise = rng.normal(0, 0.003, size=(n, 2))   # keeps vol_20 comfortably positive
     close = pd.DataFrame({
-        "EARLY_WINNER": 100 * np.exp(early + rng.normal(0, 0.005, n).cumsum() * 0),
-        "LATE_WINNER": 100 * np.exp(late + rng.normal(0, 0.005, n).cumsum() * 0),
-        "FLAT": 100 * np.exp(flat),
+        "STEADY": 100 * np.exp(logp["STEADY"] + noise[:, 0].cumsum() * 0.03),
+        "BACKLOADED": 100 * np.exp(logp["BACKLOADED"] + noise[:, 1].cumsum() * 0.03),
     }, index=dates)
     high, low = close * 1.01, close * 0.99
     volume = pd.DataFrame(5e6, index=dates, columns=tickers)
@@ -406,12 +435,27 @@ def test_ensemble_lookbacks_changes_the_ranking():
     single = model_ai.compute_features(data, cfg)
     ensembled = model_ai.compute_features(
         data, {**cfg, "ensemble_lookbacks": [(126, 21), (252, 21)]})
-
-    assert not single["mom_12_1"].equals(ensembled["mom_12_1"]), (
-        "ensembling produced identical mom_12_1 values to the single-window "
-        "case on a panel specifically constructed so the windows disagree"
+    assert len(single) == 2 and len(ensembled) == 2, (
+        "both tickers must survive the feature filter for this to be a "
+        f"meaningful comparison - got single={len(single)}, ensembled={len(ensembled)}"
     )
-    print("PASS test_ensemble_lookbacks_changes_the_ranking")
+
+    # Compare RANK order, not raw values: the ensembled column is already
+    # cross-sectionally z-scored (mean 0, std 1) while the single-window
+    # column is a raw fractional return - those are on different numeric
+    # scales and would differ "by construction" regardless of whether
+    # ensembling actually changed anything, so a raw-value inequality check
+    # would pass even under a broken implementation. Rank order is the thing
+    # that actually matters (it's what select_names()'s nlargest() uses).
+    single_rank = single["mom_12_1"].rank()
+    ensembled_rank = ensembled["mom_12_1"].rank()
+    assert not single_rank.equals(ensembled_rank), (
+        f"ensembling produced an IDENTICAL ranking to the single-window case "
+        f"on a panel specifically constructed so the windows disagree: "
+        f"single={single_rank.to_dict()} ensembled={ensembled_rank.to_dict()}"
+    )
+    print("PASS test_ensemble_lookbacks_changes_the_ranking "
+         f"(single rank={single_rank.to_dict()}, ensembled rank={ensembled_rank.to_dict()})")
 
 
 def test_use_covariance_sizing_default_is_a_no_op():
