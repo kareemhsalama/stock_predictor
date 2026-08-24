@@ -3,13 +3,9 @@
   "breaker_on": false,
   "bootstrapped": true,
   "positions": {
-    "AMD": {
-      "entry_date": "2026-07-30",
-      "peak_price": 527.24
-    },
     "JNJ": {
       "entry_date": "2026-07-30",
-      "peak_price": 272.235
+      "peak_price": 273.31
     },
     "MRK": {
       "entry_date": "2026-07-30",
@@ -23,17 +19,13 @@
       "entry_date": "2026-08-10",
       "peak_price": 1265.76
     },
-    "RTX": {
-      "entry_date": "2026-08-17",
-      "peak_price": 223.60000610351562
-    },
     "TMO": {
       "entry_date": "2026-08-24",
-      "peak_price": 618.4000244140625
+      "peak_price": 620.85
     },
     "AMGN": {
       "entry_date": "2026-08-24",
-      "peak_price": 440.3299865722656
+      "peak_price": 440.875
     }
   }
 }
