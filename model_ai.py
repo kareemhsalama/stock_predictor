@@ -91,6 +91,7 @@ CONFIG = {
     "meta_prob_threshold": 0.55,
     "min_dollar_volume":   50_000_000,   # 20d average, market currency
     "regime_factors":      {"RISK_ON": 1.0, "NEUTRAL": 0.5, "RISK_OFF": 0.1},
+    "regime_confirm_weeks": 1,   # 1 = off (raw regime, unchanged behavior)
 }
 
 MARKET_DEFAULTS = {
@@ -343,6 +344,63 @@ def detect_regime(data: PriceData, cfg: dict) -> dict:
             "benchmark": data.benchmark_name}
 
 
+# ~1 trading week; matches backtest_model_ai.REBALANCE_EVERY. Used only to
+# space the trailing samples detect_regime_confirmed() walks back through -
+# it does not assume the caller's actual rebalance calendar.
+REGIME_CONFIRM_STEP_DAYS = 5
+
+
+def detect_regime_confirmed(data: PriceData, cfg: dict) -> dict:
+    """
+    Hysteresis-filtered regime, to stop the exposure factor flipping (and
+    paying transaction costs) on a single noisy week.
+
+    A regime change only takes effect once the RAW weekly classification
+    (plain detect_regime, unchanged above) has held for
+    ``cfg["regime_confirm_weeks"]`` consecutive ~weekly observations, sampled
+    every REGIME_CONFIRM_STEP_DAYS trading days walking backward from the
+    last bar in ``data``. Still a pure function of ``data`` alone - every
+    sample point is <= data's last bar, so this adds zero new look-ahead
+    surface beyond what detect_regime() already has via _slice().
+
+    ``regime_confirm_weeks <= 1`` (the default) returns detect_regime(data,
+    cfg) unchanged, so this is fully backward compatible.
+    """
+    n = int(cfg.get("regime_confirm_weeks", 1))
+    raw_now = detect_regime(data, cfg)
+    if n <= 1:
+        return raw_now
+
+    dates = data.close.index
+    if len(dates) == 0:
+        return raw_now
+    pos = len(dates) - 1
+
+    buffer = n + 8   # a few extra samples so a real prior regime can be found
+    positions = [pos - k * REGIME_CONFIRM_STEP_DAYS for k in range(buffer)]
+    positions = [p for p in positions if p >= 0]
+    raw_series = [detect_regime(_slice(data, dates[p]), cfg)["regime"] for p in positions]
+
+    run_len = 1
+    for j in range(1, len(raw_series)):
+        if raw_series[j] == raw_series[0]:
+            run_len += 1
+        else:
+            break
+
+    if run_len >= n:
+        confirmed = raw_series[0]
+    else:
+        # Not enough confirmation for the new raw regime yet - hold whatever
+        # was confirmed just before this run started (or the raw regime
+        # itself if history runs out, a safe fallback since it's still no
+        # more forward-looking than plain detect_regime already is).
+        confirmed = raw_series[run_len] if run_len < len(raw_series) else raw_series[0]
+
+    return {**raw_now, "regime": confirmed, "factor": cfg["regime_factors"][confirmed],
+           "raw_regime": raw_series[0], "confirm_run_len": run_len}
+
+
 # ============================================================
 # LAYER 2 - SIGNAL GENERATION
 # ============================================================
@@ -499,7 +557,7 @@ def generate_target_weights(as_of_date, market: str, config: dict | None = None,
     if len(d.close) == 0:
         return {}
 
-    regime = detect_regime(d, cfg)
+    regime = detect_regime_confirmed(d, cfg)
     if verbose:
         print(f"[regime] {regime['regime']} (factor {regime['factor']:.2f}) "
               f"via {regime['benchmark']} — {regime['reason']}")

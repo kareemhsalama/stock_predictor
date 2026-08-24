@@ -205,6 +205,81 @@ def test_meta_label_no_lookahead():
     print(f"PASS test_meta_label_no_lookahead ({len(from_earlier)} shared rows)")
 
 
+def test_regime_confirm_weeks_default_is_a_no_op():
+    """regime_confirm_weeks=1 (the default) must return byte-identical output
+    to plain detect_regime - no behavior change for anyone who hasn't opted
+    in to hysteresis."""
+    data = _synthetic_panel()
+    cfg = _test_config()
+    assert cfg.get("regime_confirm_weeks", 1) == 1
+
+    plain = model_ai.detect_regime(data, cfg)
+    confirmed = model_ai.detect_regime_confirmed(data, cfg)
+    assert plain == confirmed, f"default (n=1) changed output: {plain} vs {confirmed}"
+    print("PASS test_regime_confirm_weeks_default_is_a_no_op")
+
+
+def test_regime_confirm_weeks_delays_a_flip():
+    """
+    With hysteresis on, a regime flip that only just happened (raw regime
+    differs from a few weeks ago) must NOT be reported yet - the prior
+    confirmed regime should still be returned until the new one has held
+    for regime_confirm_weeks consecutive ~weekly samples.
+    """
+    n = len(_synthetic_panel().close)
+    dates = pd.bdate_range("2020-01-01", periods=n)
+    tickers = [f"T{i:02d}" for i in range(12)]
+
+    # A benchmark that trends up for a long stretch, then drops sharply RIGHT
+    # at the end - just 1 weekly sample's worth of "new" regime, not enough
+    # to confirm under a 3-week hysteresis window.
+    bench_vals = np.linspace(100, 200, n)
+    bench_vals[-3:] = bench_vals[-4] * 0.7   # sudden break at the very end
+    bench = pd.Series(bench_vals, index=dates)
+
+    rng = np.random.default_rng(3)
+    steps = rng.normal(0.0004, 0.01, size=(n, 12))
+    close = pd.DataFrame(100 * np.exp(np.cumsum(steps, axis=0)), index=dates, columns=tickers)
+    high = close * 1.01
+    low = close * 0.99
+    volume = pd.DataFrame(rng.uniform(2e6, 9e6, size=close.shape), index=dates, columns=tickers)
+    data = model_ai.PriceData(close=close, high=high, low=low, volume=volume,
+                              benchmark=bench, benchmark_name="TEST")
+
+    cfg_off = _test_config()
+    cfg_on = {**cfg_off, "regime_confirm_weeks": 3}
+
+    raw = model_ai.detect_regime(data, cfg_off)
+    hysteresis = model_ai.detect_regime_confirmed(data, cfg_on)
+
+    assert raw["regime"] == "RISK_OFF", f"test setup didn't produce a fresh RISK_OFF break: {raw}"
+    assert hysteresis["regime"] != "RISK_OFF", (
+        f"a single-sample break was NOT held back by 3-week hysteresis: {hysteresis}"
+    )
+    assert hysteresis["raw_regime"] == "RISK_OFF"
+    print(f"PASS test_regime_confirm_weeks_delays_a_flip (raw={raw['regime']}, "
+         f"confirmed={hysteresis['regime']})")
+
+
+def test_regime_confirm_weeks_preserves_no_lookahead():
+    """Same invariant as test_no_lookahead, but through the hysteresis path -
+    a longer trailing history must not change what's reported as of `as_of`."""
+    full = _synthetic_panel()
+    cfg = {**_test_config(), "regime_confirm_weeks": 3}
+
+    for offset in (0, 30, 90):
+        as_of = full.close.index[-1 - offset]
+        truncated = model_ai._slice(full, as_of)
+
+        from_full = model_ai.detect_regime_confirmed(model_ai._slice(full, as_of), cfg)
+        from_trunc = model_ai.detect_regime_confirmed(truncated, cfg)
+
+        assert from_full["regime"] == from_trunc["regime"], (
+            f"LOOK-AHEAD in detect_regime_confirmed at {as_of.date()}: "
+            f"{from_full['regime']} != {from_trunc['regime']}")
+    print("PASS test_regime_confirm_weeks_preserves_no_lookahead")
+
+
 if __name__ == "__main__":
     failures = 0
     for name, fn in sorted(globals().items()):
