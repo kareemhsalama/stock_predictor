@@ -108,6 +108,7 @@ CONFIG = {
     "regime_confirm_weeks": 1,   # 1 = off (raw regime, unchanged behavior)
     "sector_map":          None,   # {ticker: sector}; None = no sector cap
     "max_sector_weight":   1.0,    # 1.0 = off (no sector concentration cap)
+    "ensemble_lookbacks":  None,   # e.g. [(126,21),(252,21),(252,63)]; None = off
 }
 
 MARKET_DEFAULTS = {
@@ -430,23 +431,62 @@ def detect_regime_confirmed(data: PriceData, cfg: dict) -> dict:
 # ============================================================
 # LAYER 2 - SIGNAL GENERATION
 # ============================================================
+def _ensembled_momentum(close: pd.DataFrame, lookbacks: list[tuple[int, int]]) -> pd.Series:
+    """
+    Average cross-sectional z-score of long-horizon momentum across several
+    (lookback, skip) window pairs (e.g. 6-1, 12-1, 12-3 month), instead of a
+    single window. Pure variance reduction - no new fitted parameters, just
+    averaging an existing signal computed a few different ways to reduce
+    single-window noise and the rank churn (turnover) it causes.
+
+    Returns an already cross-sectionally standardized series (each variant is
+    z-scored before averaging), so _composite_score's own _zscore() call on
+    this is then a no-op (z-scoring an already mean-0/std-1 series is the
+    identity transform) - this slots in as a drop-in replacement for the raw
+    single-window mom_12_1 with no other change needed downstream.
+    """
+    per_variant = []
+    for lb, skip in lookbacks:
+        raw = {}
+        for t in close.columns:
+            px = close[t].dropna()
+            if len(px) < lb + 1:
+                continue
+            raw[t] = px.iloc[-1 - skip] / px.iloc[-1 - lb] - 1
+        if raw:
+            per_variant.append(_zscore(pd.Series(raw)))
+    if not per_variant:
+        return pd.Series(dtype=float)
+    return pd.concat(per_variant, axis=1).mean(axis=1)
+
+
 def compute_features(data: PriceData, cfg: dict) -> pd.DataFrame:
     """Per-ticker feature table as of the last bar in ``data``."""
     close, volume = data.close, data.volume
     long_lb, skip = cfg["mom_long_lookback"], cfg["mom_long_skip"]
     short_lb, trend_sma = cfg["mom_short_lookback"], cfg["trend_sma"]
     vol_w = cfg["vol_window"]
+    ensemble = cfg.get("ensemble_lookbacks")   # list[(lb, skip)] or None/[]; see _ensembled_momentum
 
     min_rows = max(long_lb + 1, trend_sma + 1)
+    if ensemble:
+        min_rows = max(min_rows, max(lb for lb, _ in ensemble) + 1)
+    ensembled_mom = _ensembled_momentum(close, ensemble) if ensemble else None
+
     rows = []
     for t in close.columns:
         px = close[t].dropna()
         if len(px) < min_rows:
             continue
 
-        # 12-1 momentum: t-252 -> t-21. Skipping the last month sidesteps the
-        # well-documented short-term reversal that contaminates raw 12m momentum.
-        mom_long = px.iloc[-1 - skip] / px.iloc[-1 - long_lb] - 1
+        if ensembled_mom is not None:
+            if t not in ensembled_mom.index or not np.isfinite(ensembled_mom[t]):
+                continue
+            mom_long = float(ensembled_mom[t])
+        else:
+            # 12-1 momentum: t-252 -> t-21. Skipping the last month sidesteps the
+            # well-documented short-term reversal that contaminates raw 12m momentum.
+            mom_long = px.iloc[-1 - skip] / px.iloc[-1 - long_lb] - 1
         mom_short = px.iloc[-1] / px.iloc[-1 - short_lb] - 1
         sma = px.rolling(trend_sma).mean().iloc[-1]
         vol = realized_vol(px.pct_change(), vol_w).iloc[-1]

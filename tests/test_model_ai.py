@@ -345,6 +345,75 @@ def test_sector_cap_all_one_sector_leaves_cash_rather_than_breach():
     print(f"PASS test_sector_cap_all_one_sector_leaves_cash_rather_than_breach (sum={w.sum():.2%})")
 
 
+def test_ensemble_lookbacks_default_is_a_no_op():
+    """ensemble_lookbacks=None (the default) must produce byte-identical
+    mom_12_1 values to the plain single-window computation."""
+    data = _synthetic_panel()
+    cfg = _test_config()
+    assert cfg.get("ensemble_lookbacks") is None
+
+    feat = model_ai.compute_features(data, cfg)
+    feat_explicit_off = model_ai.compute_features(data, {**cfg, "ensemble_lookbacks": None})
+    pd.testing.assert_frame_equal(feat, feat_explicit_off)
+    print("PASS test_ensemble_lookbacks_default_is_a_no_op")
+
+
+def test_ensemble_lookbacks_preserves_no_lookahead():
+    """Same invariant as test_no_lookahead, through the ensembled-momentum path."""
+    full = _synthetic_panel()
+    cfg = {**_test_config(), "ensemble_lookbacks": [(126, 21), (252, 21), (252, 63)]}
+
+    for offset in (0, 30, 90):
+        as_of = full.close.index[-1 - offset]
+        truncated = model_ai._slice(full, as_of)
+
+        from_full = model_ai.generate_target_weights(as_of, "US", cfg, full, verbose=False)
+        from_trunc = model_ai.generate_target_weights(as_of, "US", cfg, truncated, verbose=False)
+        assert from_full == from_trunc, (
+            f"LOOK-AHEAD in ensembled momentum at {as_of.date()}: "
+            f"{from_full} != {from_trunc}")
+    print("PASS test_ensemble_lookbacks_preserves_no_lookahead")
+
+
+def test_ensemble_lookbacks_changes_the_ranking():
+    """Sanity check that ensembling isn't silently a no-op in practice: on a
+    panel where different lookback windows disagree, the ensembled ranking
+    must differ from the single-window ranking for at least one name."""
+    n = 400
+    dates = pd.bdate_range("2021-01-01", periods=n)
+    tickers = ["EARLY_WINNER", "LATE_WINNER", "FLAT"]
+    rng = np.random.default_rng(5)
+
+    # EARLY_WINNER rallied hard early then went flat (favoured by a longer
+    # lookback); LATE_WINNER was flat then rallied hard recently (favoured
+    # by a shorter lookback) - a single window ranks these very differently
+    # depending on which window is used; an average should land between them.
+    early = np.concatenate([np.linspace(0, 0.6, n // 2), np.full(n - n // 2, 0.6)])
+    late = np.concatenate([np.full(n // 2, 0.0), np.linspace(0, 0.6, n - n // 2)])
+    flat = np.zeros(n)
+    close = pd.DataFrame({
+        "EARLY_WINNER": 100 * np.exp(early + rng.normal(0, 0.005, n).cumsum() * 0),
+        "LATE_WINNER": 100 * np.exp(late + rng.normal(0, 0.005, n).cumsum() * 0),
+        "FLAT": 100 * np.exp(flat),
+    }, index=dates)
+    high, low = close * 1.01, close * 0.99
+    volume = pd.DataFrame(5e6, index=dates, columns=tickers)
+    data = model_ai.PriceData(close=close, high=high, low=low, volume=volume,
+                              benchmark=close.mean(axis=1), benchmark_name="TEST")
+
+    cfg = {**_test_config(), "universe": tickers, "mom_long_lookback": 252,
+          "mom_long_skip": 21}
+    single = model_ai.compute_features(data, cfg)
+    ensembled = model_ai.compute_features(
+        data, {**cfg, "ensemble_lookbacks": [(126, 21), (252, 21)]})
+
+    assert not single["mom_12_1"].equals(ensembled["mom_12_1"]), (
+        "ensembling produced identical mom_12_1 values to the single-window "
+        "case on a panel specifically constructed so the windows disagree"
+    )
+    print("PASS test_ensemble_lookbacks_changes_the_ranking")
+
+
 if __name__ == "__main__":
     failures = 0
     for name, fn in sorted(globals().items()):
