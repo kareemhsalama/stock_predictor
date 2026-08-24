@@ -29,9 +29,22 @@ import numpy as np
 import pandas as pd
 
 import model_ai
+from paper_trader import MARKETS
 
-COST_BPS = 5.0        # per side, in basis points of traded notional
 REBALANCE_EVERY = 5   # trading days ~ weekly
+
+# Nominal book size used only to scale dollar-denominated cost terms (the
+# per-order commission floor, and participation-vs-ADV impact) realistically.
+# Matches the actual paper account sizes (data/model_ai_ledger.json,
+# egx_model_ai.py's INITIAL_BUDGET) rather than being an arbitrary constant.
+NOMINAL_BUDGET = {"US": 100_000.0, "EGX": 1_000_000.0}
+
+# Phase 1 out-of-sample reserve (inclusive). Nothing in research/redesign work
+# may compute metrics using dates on or after this cutoff - run_backtest()
+# enforces it by truncating the data before this date unless the caller
+# explicitly passes allow_holdout=True, which is reserved for the one-time
+# final verification pass comparing baseline vs. redesign.
+HOLDOUT_START = "2025-01-01"
 
 
 def _metrics(returns: pd.Series, exposure: pd.Series,
@@ -74,13 +87,24 @@ def _metrics(returns: pd.Series, exposure: pd.Series,
 
 
 def run_backtest(market: str, period: str = "8y", config: dict | None = None,
-                 verbose: bool = True) -> dict:
+                 verbose: bool = True, allow_holdout: bool = False,
+                 data: model_ai.PriceData | None = None) -> dict:
     cfg = config or model_ai.market_config(market)
-    data = model_ai.load_price_data(market, cfg, period=period)
+    if data is None:
+        data = model_ai.load_price_data(market, cfg, period=period)
+
+    if not allow_holdout:
+        cutoff = pd.Timestamp(HOLDOUT_START) - pd.Timedelta(days=1)
+        data = model_ai._slice(data, cutoff)
 
     close = data.close
     dates = close.index
     rets = close.pct_change()
+    # Trailing 20-session dollar volume, for the impact/participation terms in
+    # CostModel.slippage_bps() below. Rolling, so bar i only ever sees <= i.
+    adv = (close * data.volume).rolling(20).mean()
+    costs = MARKETS[market].costs
+    budget = NOMINAL_BUDGET[market]
 
     warmup = max(cfg["mom_long_lookback"] + cfg["mom_long_skip"],
                  cfg["regime_sma_slow"]) + 5
@@ -148,10 +172,24 @@ def run_backtest(market: str, period: str = "8y", config: dict | None = None,
                 new_weights = target_s
 
         # ---- cost of moving from `weights` to `new_weights` ----
+        # Per-name, not a flat portfolio-level bps rate: commission (with its
+        # floor), spread, and ADV-scaled impact all depend on how big a slice
+        # of THIS name's own liquidity the trade is, and that varies a lot
+        # across the book.
         all_names = weights.index.union(new_weights.index)
         turnover = float((new_weights.reindex(all_names).fillna(0)
                           - weights.reindex(all_names).fillna(0)).abs().sum())
-        cost = turnover * COST_BPS / 10_000
+        book_value = equity * budget
+        cost_dollars = 0.0
+        for t in all_names:
+            delta_w = float(new_weights.get(t, 0.0) - weights.get(t, 0.0))
+            if delta_w == 0.0:
+                continue
+            notional = abs(delta_w) * book_value
+            adv_t = float(adv[t].iloc[i]) if t in adv.columns else None
+            cost_dollars += costs.fees(notional)
+            cost_dollars += notional * costs.slippage_bps(notional, adv_t) / 1e4
+        cost = cost_dollars / book_value if book_value > 0 else 0.0
         total_turnover += turnover
         turnovers.append(turnover)
         weights = new_weights[new_weights > 0] if len(new_weights) else new_weights
@@ -218,7 +256,7 @@ def _report(market, bench_name, idx, s, b):
         theirs = fmt.format(b[key]) if key in b else "-"
         print(f"  {label:<20} {mine:>14} {theirs:>22}")
     print(f"\n  Rebalances: {s['n_rebalances']}   "
-          f"(costs {COST_BPS:.0f}bps/side included)")
+          f"(real fees/spread/impact costs included, per-name)")
 
 
 def main():

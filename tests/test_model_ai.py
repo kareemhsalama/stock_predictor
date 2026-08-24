@@ -165,6 +165,46 @@ def test_max_weight_cap_renormalizes():
     print("PASS test_max_weight_cap_renormalizes")
 
 
+def test_meta_label_no_lookahead():
+    """
+    model_ai_meta.build_training_set()'s own no-lookahead claim (its docstring:
+    "a label can never peek past the decision date"), turned into an automated
+    check rather than a one-time manual trace. Two different as_of truncations
+    of the SAME panel must produce byte-identical training rows for the sample
+    dates they share - if a later cutoff ever changed an EARLIER sample's
+    features or label, that sample would have been peeking at data that, at
+    its own decision date, hadn't happened yet.
+
+    test_no_lookahead above never exercises this module at all (use_meta_label
+    defaults to False in _test_config), so without this test the meta-label
+    path has zero automated lookahead coverage.
+    """
+    import model_ai_meta
+
+    full = _synthetic_panel(n_days=700, n_tickers=12, seed=7)
+    cfg = _test_config()
+
+    earlier = model_ai._slice(full, full.close.index[-300])
+    later = model_ai._slice(full, full.close.index[-250])   # 50 bars further
+
+    from_earlier = model_ai_meta.build_training_set(earlier, cfg)
+    from_later = model_ai_meta.build_training_set(later, cfg)
+
+    assert len(from_earlier) > 0, "synthetic panel produced no training rows at all"
+    assert len(from_later) >= len(from_earlier), (
+        "a strictly longer panel produced FEWER training rows - "
+        f"{len(from_later)} < {len(from_earlier)}"
+    )
+
+    shared = from_later.iloc[:len(from_earlier)].reset_index(drop=True)
+    mismatch = shared.compare(from_earlier.reset_index(drop=True))
+    assert mismatch.empty, (
+        f"LOOK-AHEAD in meta-label training set: {len(mismatch)} row(s) "
+        f"changed when the panel was extended 50 bars further:\n{mismatch}"
+    )
+    print(f"PASS test_meta_label_no_lookahead ({len(from_earlier)} shared rows)")
+
+
 if __name__ == "__main__":
     failures = 0
     for name, fn in sorted(globals().items()):
