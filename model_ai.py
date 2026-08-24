@@ -406,15 +406,27 @@ def _composite_score(feat: pd.DataFrame, cfg: dict) -> pd.Series:
     return score
 
 
-def select_names(feat: pd.DataFrame, cfg: dict) -> pd.DataFrame:
-    """Liquidity filter -> trend gate -> composite score -> top N."""
+def liquid_universe(feat: pd.DataFrame, cfg: dict) -> pd.DataFrame:
+    """
+    Liquidity filter -> universe_size cap. The candidate set select_names()
+    ranks from, exposed separately (not just inlined there) so a "no signal"
+    baseline can compare against exactly this same eligible set rather than
+    the raw ticker list — otherwise a no-skill baseline would be unfairly
+    handicapped by illiquid names the real strategy would never hold either.
+    """
     if feat.empty:
         return feat
-
     liquid = feat[feat["dollar_volume"] >= cfg["min_dollar_volume"]]
     if liquid.empty:
         return liquid
-    liquid = liquid.nlargest(min(cfg["universe_size"], len(liquid)), "dollar_volume")
+    return liquid.nlargest(min(cfg["universe_size"], len(liquid)), "dollar_volume")
+
+
+def select_names(feat: pd.DataFrame, cfg: dict) -> pd.DataFrame:
+    """Liquidity filter -> trend gate -> composite score -> top N."""
+    liquid = liquid_universe(feat, cfg)
+    if liquid.empty:
+        return liquid
 
     eligible = liquid[liquid["trend_ok"]].copy()
     if eligible.empty:
