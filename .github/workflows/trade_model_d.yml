@@ -29,4 +29,6 @@ jobs:
           # Model D's own paper account (see live_trader_meanreversion.py).
           ALPACA_API_KEY_D: ${{ secrets.ALPACA_API_KEY_D }}
           ALPACA_SECRET_KEY_D: ${{ secrets.ALPACA_SECRET_KEY_D }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python live_trader_meanreversion.py

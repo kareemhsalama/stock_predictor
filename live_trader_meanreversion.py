@@ -20,6 +20,7 @@ isolation create a separate paper account and wire the _D secrets).
 """
 
 import os
+from datetime import datetime, timezone
 
 import yfinance as yf
 from dotenv import load_dotenv
@@ -28,6 +29,8 @@ from alpaca.trading.client import TradingClient
 from alpaca.trading.requests import MarketOrderRequest
 from alpaca.trading.enums import OrderSide, TimeInForce
 
+from telegram_notifier import TelegramNotifier
+
 load_dotenv()
 
 # Prefer Model D's dedicated account; fall back to the primary keys.
@@ -35,6 +38,12 @@ api_key = os.getenv("ALPACA_API_KEY_D") or os.getenv("ALPACA_API_KEY")
 secret_key = os.getenv("ALPACA_SECRET_KEY_D") or os.getenv("ALPACA_SECRET_KEY")
 
 client = TradingClient(api_key, secret_key, paper=True)
+
+try:
+    notifier = TelegramNotifier()
+except ValueError as e:
+    print(f"Telegram alerts disabled: {e}")
+    notifier = None
 
 # Mean-reversion universe. Widened from the backtest's original 5 names
 # (AAPL/JPM/KO/NVDA/XOM) because that universe only produced ~4 entries per
@@ -87,7 +96,7 @@ def current_qty(ticker, positions):
     return 0
 
 
-def trade(ticker, positions):
+def trade(ticker, positions, trades_today=None):
     z, price = zscore(ticker)
     if z is None:
         return
@@ -114,6 +123,18 @@ def trade(ticker, positions):
         try:
             client.submit_order(order)
             print(f"  BUY {qty}x {ticker} placed")
+            trade_record = {
+                "symbol": ticker, "side": "BUY", "qty": qty, "price": price,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "reason": f"z-score {z:+.2f} < entry threshold -{ENTRY_Z}",
+            }
+            if trades_today is not None:
+                trades_today.append(trade_record)
+            if notifier:
+                try:
+                    notifier.send_trade_alert(trade_record)
+                except Exception as e:
+                    print(f"  Telegram alert failed: {e}")
         except Exception as e:
             print(f"  Order failed: {e}")
     elif action == "SELL":
@@ -122,6 +143,20 @@ def trade(ticker, positions):
         try:
             client.submit_order(order)
             print(f"  SELL {held}x {ticker} placed")
+            reason = (f"z-score {z:+.2f} reverted above -{EXIT_Z}" if z > -EXIT_Z
+                     else f"z-score {z:+.2f} breached stop -{STOP_Z}")
+            trade_record = {
+                "symbol": ticker, "side": "SELL", "qty": held, "price": price,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "reason": reason,
+            }
+            if trades_today is not None:
+                trades_today.append(trade_record)
+            if notifier:
+                try:
+                    notifier.send_trade_alert(trade_record)
+                except Exception as e:
+                    print(f"  Telegram alert failed: {e}")
         except Exception as e:
             print(f"  Order failed: {e}")
 
@@ -132,14 +167,27 @@ def main():
         print("Market is closed.")
         return
 
-    positions = client.get_all_positions()
-    for ticker in TICKERS:
-        try:
-            trade(ticker, positions)
-        except Exception as e:
-            print(f"Error with {ticker}: {e}")
+    trades_today = []
+    try:
+        positions = client.get_all_positions()
+        for ticker in TICKERS:
+            try:
+                trade(ticker, positions, trades_today=trades_today)
+            except Exception as e:
+                print(f"Error with {ticker}: {e}")
 
-    print(f"\nPortfolio: ${float(client.get_account().portfolio_value):,.2f}")
+        print(f"\nPortfolio: ${float(client.get_account().portfolio_value):,.2f}")
+    finally:
+        if notifier:
+            try:
+                account = client.get_account()
+                equity = float(account.portfolio_value)
+                last_equity = getattr(account, "last_equity", None)
+                pnl = ({"daily_pnl": equity - float(last_equity)}
+                      if last_equity is not None else None)
+                notifier.send_daily_summary(trades_today, pnl=pnl, equity=equity)
+            except Exception as e:
+                print(f"Telegram daily summary failed: {e}")
 
 
 if __name__ == "__main__":

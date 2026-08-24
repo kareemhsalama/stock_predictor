@@ -30,6 +30,8 @@ jobs:
         env:
           ALPACA_API_KEY_AI: ${{ secrets.ALPACA_API_KEY_AI }}
           ALPACA_SECRET_KEY_AI: ${{ secrets.ALPACA_SECRET_KEY_AI }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python live_trader_ai.py rebalance
 
       - name: Commit risk state

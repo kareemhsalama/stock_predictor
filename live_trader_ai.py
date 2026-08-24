@@ -33,6 +33,7 @@ from alpaca.trading.requests import MarketOrderRequest
 from dotenv import load_dotenv
 
 import model_ai
+from telegram_notifier import TelegramNotifier
 
 load_dotenv()
 
@@ -51,6 +52,12 @@ if not api_key or not secret_key:
     )
 
 client = TradingClient(api_key, secret_key, paper=True)
+
+try:
+    notifier = TelegramNotifier()
+except ValueError as e:
+    print(f"Telegram alerts disabled: {e}")
+    notifier = None
 
 
 # ============================================================
@@ -99,13 +106,26 @@ def current_positions() -> dict[str, dict]:
     return out
 
 
-def submit(symbol: str, qty: int, side: OrderSide) -> bool:
+def submit(symbol: str, qty: int, side: OrderSide, price: float | None = None,
+          reason: str = "", trades_today: list | None = None) -> bool:
     if qty <= 0:
         return False
     try:
         client.submit_order(MarketOrderRequest(
             symbol=symbol, qty=qty, side=side, time_in_force=TimeInForce.DAY))
         print(f"  {side.value.upper():4} {qty:>5}x {symbol}")
+        trade_record = {
+            "symbol": symbol, "side": side.value.upper(), "qty": qty,
+            "price": price, "reason": reason,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }
+        if trades_today is not None:
+            trades_today.append(trade_record)
+        if notifier:
+            try:
+                notifier.send_trade_alert(trade_record)
+            except Exception as e:
+                print(f"  Telegram alert failed: {e}")
         return True
     except Exception as e:
         print(f"  ORDER FAILED {side.value} {qty}x {symbol}: {e}")
@@ -122,7 +142,7 @@ def market_is_open() -> bool:
 # ============================================================
 # LAYER 4 - DAILY RISK CHECKS
 # ============================================================
-def check_stops(state: dict, cfg: dict) -> dict:
+def check_stops(state: dict, cfg: dict, trades_today: list | None = None) -> dict:
     """
     Daily risk pass, independent of the rebalance cadence:
       * hard stop     -8% from entry
@@ -153,7 +173,8 @@ def check_stops(state: dict, cfg: dict) -> dict:
               f"-{cfg['dd_breaker']:.0%} - flattening to cash")
         state["breaker_on"] = True
         for sym, pos in positions.items():
-            submit(sym, pos["qty"], OrderSide.SELL)
+            submit(sym, pos["qty"], OrderSide.SELL, price=pos["price"],
+                  reason="drawdown breaker", trades_today=trades_today)
         state["positions"] = {}
         return state
 
@@ -182,7 +203,8 @@ def check_stops(state: dict, cfg: dict) -> dict:
 
         if reason:
             print(f"  STOP {sym}: {reason}")
-            if submit(sym, pos["qty"], OrderSide.SELL):
+            if submit(sym, pos["qty"], OrderSide.SELL, price=px, reason=reason,
+                     trades_today=trades_today):
                 pos_state.pop(sym, None)
         else:
             print(f"  hold {sym}: {pnl_pct:+.2%} from entry")
@@ -193,7 +215,7 @@ def check_stops(state: dict, cfg: dict) -> dict:
 # ============================================================
 # WEEKLY REBALANCE
 # ============================================================
-def rebalance(state: dict, cfg: dict) -> dict:
+def rebalance(state: dict, cfg: dict, trades_today: list | None = None) -> dict:
     """Move the book to MODEL_AI's target weights."""
     account = client.get_account()
     equity = float(account.equity)
@@ -232,7 +254,8 @@ def rebalance(state: dict, cfg: dict) -> dict:
             print(f"  keep {sym}: min-hold ({held}d < {cfg['min_hold_days']}d)")
             continue
         print(f"  exit {sym}: dropped from targets")
-        if submit(sym, pos["qty"], OrderSide.SELL):
+        if submit(sym, pos["qty"], OrderSide.SELL, price=pos["price"],
+                 reason="dropped from rebalance targets", trades_today=trades_today):
             pos_state.pop(sym, None)
 
     # ---- entries / resizes ----
@@ -255,7 +278,9 @@ def rebalance(state: dict, cfg: dict) -> dict:
             continue
 
         if delta > 0:
-            if submit(sym, delta, OrderSide.BUY):
+            if submit(sym, delta, OrderSide.BUY, price=price,
+                     reason=f"rebalance entry, target weight {weight:.1%}",
+                     trades_today=trades_today):
                 pos_state.setdefault(sym, {"entry_date": _today(),
                                            "peak_price": price})
         else:
@@ -263,7 +288,9 @@ def rebalance(state: dict, cfg: dict) -> dict:
             if held < cfg["min_hold_days"]:
                 print(f"  keep {sym}: min-hold blocks trim ({held}d)")
                 continue
-            submit(sym, -delta, OrderSide.SELL)
+            submit(sym, -delta, OrderSide.SELL, price=price,
+                  reason=f"rebalance trim to target weight {weight:.1%}",
+                  trades_today=trades_today)
 
     return state
 
@@ -294,19 +321,32 @@ def main():
               "rather than waiting for the Monday slot.")
         mode = "rebalance"
 
-    if mode == "stops":
-        state = check_stops(state, cfg)
-    else:
-        state = rebalance(state, cfg)
-        # Set even if the rebalance produced no positions (e.g. RISK_OFF):
-        # the model has now had its first look, so the weekly cadence takes over.
-        state["bootstrapped"] = True
+    trades_today = []
+    try:
+        if mode == "stops":
+            state = check_stops(state, cfg, trades_today=trades_today)
+        else:
+            state = rebalance(state, cfg, trades_today=trades_today)
+            # Set even if the rebalance produced no positions (e.g. RISK_OFF):
+            # the model has now had its first look, so the weekly cadence takes over.
+            state["bootstrapped"] = True
 
-    save_state(state)
+        save_state(state)
 
-    account = client.get_account()
-    print(f"\nPortfolio value: ${float(account.portfolio_value):,.2f} "
-          f"| cash ${float(account.cash):,.2f}")
+        account = client.get_account()
+        print(f"\nPortfolio value: ${float(account.portfolio_value):,.2f} "
+              f"| cash ${float(account.cash):,.2f}")
+    finally:
+        if notifier:
+            try:
+                account = client.get_account()
+                equity = float(account.portfolio_value)
+                last_equity = getattr(account, "last_equity", None)
+                pnl = ({"daily_pnl": equity - float(last_equity)}
+                      if last_equity is not None else None)
+                notifier.send_daily_summary(trades_today, pnl=pnl, equity=equity)
+            except Exception as e:
+                print(f"Telegram daily summary failed: {e}")
 
 
 if __name__ == "__main__":

@@ -20,6 +20,13 @@ import yfinance as yf
 from sklearn.ensemble import RandomForestClassifier
 
 from paper_trader import PaperTrader
+from telegram_notifier import TelegramNotifier
+
+try:
+    notifier = TelegramNotifier()
+except ValueError as e:
+    print(f"Telegram alerts disabled: {e}")
+    notifier = None
 
 # EGX universe to trade (subset of EGX_TICKERS in egy.py).
 EGX_TICKERS = ["COMI.CA", "TMGH.CA", "SWDY.CA"]
@@ -142,6 +149,24 @@ def predict_signal(ticker):
     return confidence, last_close, adv_value
 
 
+def _notify_fill(result: dict, reason: str, trades_today: list | None = None):
+    """Build a Telegram-shaped trade record from a PaperTrader buy()/sell()
+    result and send it, if the order actually filled."""
+    if result.get("status") != "FILLED":
+        return
+    trade_record = {
+        "symbol": result["symbol"], "side": result["side"], "qty": result["qty"],
+        "price": result["price"], "timestamp": result["timestamp"], "reason": reason,
+    }
+    if trades_today is not None:
+        trades_today.append(trade_record)
+    if notifier:
+        try:
+            notifier.send_trade_alert(trade_record)
+        except Exception as e:
+            print(f"Telegram alert failed: {e}")
+
+
 def run():
     trader = PaperTrader(
         model="A",
@@ -151,45 +176,63 @@ def run():
         name="Technical ML - Random Forest (EGX)",
     )
 
-    prices = {}
-    for ticker in EGX_TICKERS:
-        try:
-            confidence, price, adv_value = predict_signal(ticker)
-        except Exception as e:
-            print(f"[{ticker}] error: {e}")
-            continue
-        if price is not None:
-            prices[ticker] = price
-        if confidence is None or price is None:
-            continue
+    trades_today = []
+    snap = None
+    prev_equity = None
+    try:
+        prices = {}
+        for ticker in EGX_TICKERS:
+            try:
+                confidence, price, adv_value = predict_signal(ticker)
+            except Exception as e:
+                print(f"[{ticker}] error: {e}")
+                continue
+            if price is not None:
+                prices[ticker] = price
+            if confidence is None or price is None:
+                continue
 
-        held_qty = trader.position_qty(ticker)
+            held_qty = trader.position_qty(ticker)
 
-        if confidence > THRESHOLD and held_qty == 0:
-            # Size through affordable_qty so fees come out of the slice rather
-            # than pushing the order past the cash balance and getting it
-            # rejected at the boundary.
-            qty = trader.affordable_qty(price, adv_value,
-                                        budget=trader.cash * RISK_PCT)
-            if qty > 0:
-                trader.buy(ticker, qty, price, adv_value)
+            if confidence > THRESHOLD and held_qty == 0:
+                # Size through affordable_qty so fees come out of the slice rather
+                # than pushing the order past the cash balance and getting it
+                # rejected at the boundary.
+                qty = trader.affordable_qty(price, adv_value,
+                                            budget=trader.cash * RISK_PCT)
+                if qty > 0:
+                    result = trader.buy(ticker, qty, price, adv_value)
+                    _notify_fill(result, f"RF confidence {confidence:.1%} > "
+                                f"threshold {THRESHOLD:.1%}", trades_today)
+                else:
+                    print(f"[{ticker}] BUY skipped — cash slice too small for 1 share")
+            elif confidence <= THRESHOLD and held_qty > 0:
+                result = trader.sell(ticker, held_qty, price, adv_value)
+                _notify_fill(result, f"RF confidence {confidence:.1%} <= "
+                            f"threshold {THRESHOLD:.1%}", trades_today)
             else:
-                print(f"[{ticker}] BUY skipped — cash slice too small for 1 share")
-        elif confidence <= THRESHOLD and held_qty > 0:
-            trader.sell(ticker, held_qty, price, adv_value)
-        else:
-            action = "HOLD" if held_qty > 0 else "STAY FLAT"
-            print(f"[{ticker}] {action}")
+                action = "HOLD" if held_qty > 0 else "STAY FLAT"
+                print(f"[{ticker}] {action}")
 
-    snap = trader.snapshot(prices)
-    print(f"\n--- EGX Model A snapshot {snap['date']} ---")
-    print(f"  Equity: {snap['equity']:,.2f} EGP | "
-          f"Cash: {snap['cash']:,.2f} EGP | PnL: {snap['pnl']:+,.2f} EGP")
-    print(f"  Costs to date: {trader.fees_paid:,.2f} EGP fees + "
-          f"{trader.slippage_paid:,.2f} EGP slippage "
-          f"(applied from {trader.cost_model_from})")
-    print(f"  Open positions: {len(snap['positions'])}")
-    print(f"  Ledger: {trader.ledger_path}")
+        prev_equity = trader.snapshots[-1]["equity"] if trader.snapshots else None
+        snap = trader.snapshot(prices)
+        print(f"\n--- EGX Model A snapshot {snap['date']} ---")
+        print(f"  Equity: {snap['equity']:,.2f} EGP | "
+              f"Cash: {snap['cash']:,.2f} EGP | PnL: {snap['pnl']:+,.2f} EGP")
+        print(f"  Costs to date: {trader.fees_paid:,.2f} EGP fees + "
+              f"{trader.slippage_paid:,.2f} EGP slippage "
+              f"(applied from {trader.cost_model_from})")
+        print(f"  Open positions: {len(snap['positions'])}")
+        print(f"  Ledger: {trader.ledger_path}")
+    finally:
+        if notifier:
+            try:
+                pnl = ({"daily_pnl": snap["equity"] - prev_equity}
+                      if snap is not None and prev_equity is not None else None)
+                equity = snap["equity"] if snap is not None else None
+                notifier.send_daily_summary(trades_today, pnl=pnl, equity=equity)
+            except Exception as e:
+                print(f"Telegram daily summary failed: {e}")
 
 
 if __name__ == "__main__":

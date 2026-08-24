@@ -3,6 +3,7 @@ import pandas as pd
 
 from dotenv import load_dotenv
 import os
+from datetime import datetime, timezone
 
 load_dotenv()
 
@@ -13,6 +14,8 @@ from sklearn.metrics import classification_report
 from alpaca.trading.requests import MarketOrderRequest
 from alpaca.trading.enums import OrderSide, TimeInForce
 
+from telegram_notifier import TelegramNotifier
+
 api_key = os.getenv("ALPACA_API_KEY")
 secret_key = os.getenv("ALPACA_SECRET_KEY")
 
@@ -20,6 +23,12 @@ secret_key = os.getenv("ALPACA_SECRET_KEY")
 from alpaca.trading.client import TradingClient
 
 client = TradingClient(api_key, secret_key, paper=True)
+
+try:
+    notifier = TelegramNotifier()
+except ValueError as e:
+    print(f"Telegram alerts disabled: {e}")
+    notifier = None
 
 def calculate_rsi(prices, period=14):
     delta = prices.diff()
@@ -30,7 +39,7 @@ def calculate_rsi(prices, period=14):
     rs = avg_gain / avg_loss
     return 100 - (100 / (1 + rs))
 
-def live_trade(ticker, threshold=0.55, risk_pct=0.10):
+def live_trade(ticker, threshold=0.55, risk_pct=0.10, trades_today=None):
     clock = client.get_clock()
     if not clock.is_open:
         print("Market is closed.")
@@ -111,6 +120,19 @@ def live_trade(ticker, threshold=0.55, risk_pct=0.10):
             try:
                 client.submit_order(order)
                 print(f"Order placed!")
+                trade_record = {
+                    "symbol": ticker, "side": "BUY", "qty": quantity,
+                    "price": curr_price,
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "reason": f"RF confidence {confidence:.1%} > threshold {threshold:.1%}",
+                }
+                if trades_today is not None:
+                    trades_today.append(trade_record)
+                if notifier:
+                    try:
+                        notifier.send_trade_alert(trade_record)
+                    except Exception as e:
+                        print(f"Telegram alert failed: {e}")
             except Exception as e:
                 print(f"Order failed: {e}")
     elif confidence <= threshold and already_own:
@@ -123,6 +145,19 @@ def live_trade(ticker, threshold=0.55, risk_pct=0.10):
         try:
             client.submit_order(order)
             print(f"Order placed!")
+            trade_record = {
+                "symbol": ticker, "side": "SELL", "qty": current_qty,
+                "price": curr_price,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "reason": f"RF confidence {confidence:.1%} <= threshold {threshold:.1%}",
+            }
+            if trades_today is not None:
+                trades_today.append(trade_record)
+            if notifier:
+                try:
+                    notifier.send_trade_alert(trade_record)
+                except Exception as e:
+                    print(f"Telegram alert failed: {e}")
         except Exception as e:
             print(f"Order failed: {e}")
     else:
@@ -138,8 +173,25 @@ def live_trade(ticker, threshold=0.55, risk_pct=0.10):
 
 if __name__ == "__main__":
     tickers = ["AAPL", "MSFT", "GOOGL", "TSLA", "NVDA"]
-    for t in tickers:
-        try:
-            live_trade(t)
-        except Exception as e:
-            print(f"Error with {t}: {e}")
+    trades_today = []
+    try:
+        for t in tickers:
+            try:
+                live_trade(t, trades_today=trades_today)
+            except Exception as e:
+                print(f"Error with {t}: {e}")
+    finally:
+        if notifier:
+            try:
+                account = client.get_account()
+                equity = float(account.portfolio_value)
+                # last_equity is the prior session's closing equity (a
+                # standard Alpaca account field, not a new calculation) -
+                # lets the summary show a real daily P&L rather than
+                # mislabeling cumulative equity as "today's" change.
+                last_equity = getattr(account, "last_equity", None)
+                pnl = ({"daily_pnl": equity - float(last_equity)}
+                      if last_equity is not None else None)
+                notifier.send_daily_summary(trades_today, pnl=pnl, equity=equity)
+            except Exception as e:
+                print(f"Telegram daily summary failed: {e}")

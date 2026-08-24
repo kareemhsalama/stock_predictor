@@ -23,9 +23,12 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: pip install yfinance pandas numpy scikit-learn
+        run: pip install -r requirements.txt
 
       - name: Trade + snapshot EGX Model A
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python egx_random_forest.py
 
       - name: Commit ledger update
