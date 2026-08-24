@@ -1172,6 +1172,41 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-08-24",
+      "equity": 101804.5,
+      "cash": 74760.29,
+      "pnl": 1804.5,
+      "positions": [
+        {
+          "symbol": "GOOGL",
+          "qty": 26.0,
+          "avg_entry": 350.12,
+          "current_price": 348.4,
+          "market_value": 9058.4,
+          "unrealized_pnl": -44.72,
+          "side": "long"
+        },
+        {
+          "symbol": "MSFT",
+          "qty": 19.0,
+          "avg_entry": 487.78,
+          "current_price": 487.31,
+          "market_value": 9258.89,
+          "unrealized_pnl": -8.93,
+          "side": "long"
+        },
+        {
+          "symbol": "TSLA",
+          "qty": 25.0,
+          "avg_entry": 358.22,
+          "current_price": 349.0768,
+          "market_value": 8726.92,
+          "unrealized_pnl": -228.58,
+          "side": "long"
+        }
+      ]
     }
   ]
 }
