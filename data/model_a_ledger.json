@@ -1207,6 +1207,32 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-08-25",
+      "equity": 102050.3,
+      "cash": 83530.04,
+      "pnl": 2050.300000000003,
+      "positions": [
+        {
+          "symbol": "MSFT",
+          "qty": 19.0,
+          "avg_entry": 487.78,
+          "current_price": 490.74,
+          "market_value": 9324.06,
+          "unrealized_pnl": 56.24,
+          "side": "long"
+        },
+        {
+          "symbol": "NVDA",
+          "qty": 43.0,
+          "avg_entry": 211.17907,
+          "current_price": 213.865,
+          "market_value": 9196.195,
+          "unrealized_pnl": 115.49499,
+          "side": "long"
+        }
+      ]
     }
   ]
 }
