@@ -4,15 +4,19 @@
   "market": "EGX",
   "currency": "EGP",
   "initial_budget": 1000000.0,
-  "cash": 898523.9233930272,
+  "cash": 808733.393912234,
   "positions": {
     "TMGH.CA": {
       "qty": 1018,
       "avg_price": 97.9716813528351
+    },
+    "SWDY.CA": {
+      "qty": 708,
+      "avg_price": 126.82278175253272
     }
   },
-  "fees_paid": 224.2329,
-  "slippage_paid": 299.8743,
+  "fees_paid": 291.5253,
+  "slippage_paid": 390.3124,
   "cost_model_from": "2026-08-20",
   "cost_model": {
     "commission_bps": 5.0,
@@ -163,6 +167,19 @@
       "fees": 74.7453,
       "slippage": 100.0232,
       "requested_qty": 1018,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-08-26T13:33:17.635617+00:00",
+      "side": "BUY",
+      "symbol": "SWDY.CA",
+      "qty": 708,
+      "price": 126.7277,
+      "ref_price": 126.6,
+      "cost": 89790.5295,
+      "fees": 67.2924,
+      "slippage": 90.4381,
+      "requested_qty": 708,
       "adv_known": true
     }
   ],
@@ -476,6 +493,32 @@
           "current_price": 97.8,
           "market_value": 99560.4,
           "unrealized_pnl": -174.77,
+          "side": "long"
+        }
+      ]
+    },
+    {
+      "date": "2026-08-26",
+      "equity": 998639.19,
+      "cash": 808733.39,
+      "pnl": -1360.81,
+      "positions": [
+        {
+          "symbol": "TMGH.CA",
+          "qty": 1018.0,
+          "avg_entry": 97.9717,
+          "current_price": 98.5,
+          "market_value": 100273.0,
+          "unrealized_pnl": 537.83,
+          "side": "long"
+        },
+        {
+          "symbol": "SWDY.CA",
+          "qty": 708.0,
+          "avg_entry": 126.8228,
+          "current_price": 126.6,
+          "market_value": 89632.8,
+          "unrealized_pnl": -157.73,
           "side": "long"
         }
       ]
