@@ -419,6 +419,23 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-08-28",
+      "equity": 100249.44,
+      "cash": 95301.12,
+      "pnl": 249.44000000000233,
+      "positions": [
+        {
+          "symbol": "WMT",
+          "qty": 48.0,
+          "avg_entry": 103.12,
+          "current_price": 103.09,
+          "market_value": 4948.32,
+          "unrealized_pnl": -1.44,
+          "side": "long"
+        }
+      ]
     }
   ]
 }
