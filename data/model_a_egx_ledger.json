@@ -592,6 +592,32 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-08-31",
+      "equity": 998298.29,
+      "cash": 809312.12,
+      "pnl": -1701.71,
+      "positions": [
+        {
+          "symbol": "TMGH.CA",
+          "qty": 1018.0,
+          "avg_entry": 97.9717,
+          "current_price": 97.51,
+          "market_value": 99265.18,
+          "unrealized_pnl": -469.99,
+          "side": "long"
+        },
+        {
+          "symbol": "SWDY.CA",
+          "qty": 701.0,
+          "avg_entry": 128.2152,
+          "current_price": 127.99,
+          "market_value": 89720.99,
+          "unrealized_pnl": -157.88,
+          "side": "long"
+        }
+      ]
     }
   ],
   "extra": {}
