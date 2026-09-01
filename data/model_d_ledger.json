@@ -453,6 +453,32 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-09-01",
+      "equity": 100387.97,
+      "cash": 90814.12,
+      "pnl": 387.97000000000116,
+      "positions": [
+        {
+          "symbol": "HD",
+          "qty": 14.0,
+          "avg_entry": 320.5,
+          "current_price": 320.1566,
+          "market_value": 4482.1924,
+          "unrealized_pnl": -4.8076,
+          "side": "long"
+        },
+        {
+          "symbol": "WMT",
+          "qty": 48.0,
+          "avg_entry": 103.12,
+          "current_price": 106.0761,
+          "market_value": 5091.6528,
+          "unrealized_pnl": 141.8928,
+          "side": "long"
+        }
+      ]
     }
   ]
 }
