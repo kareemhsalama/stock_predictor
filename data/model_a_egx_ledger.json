@@ -4,19 +4,19 @@
   "market": "EGX",
   "currency": "EGP",
   "initial_budget": 1000000.0,
-  "cash": 809312.1153040974,
+  "cash": 816616.8541876248,
   "positions": {
     "TMGH.CA": {
       "qty": 1018,
       "avg_price": 97.9716813528351
     },
-    "SWDY.CA": {
-      "qty": 701,
-      "avg_price": 128.21521976600746
+    "COMI.CA": {
+      "qty": 592,
+      "avg_price": 136.53886687680523
     }
   },
-  "fees_paid": 426.778,
-  "slippage_paid": 572.2682,
+  "fees_paid": 553.5072,
+  "slippage_paid": 742.1461,
   "cost_model_from": "2026-08-20",
   "cost_model": {
     "commission_bps": 5.0,
@@ -206,6 +206,33 @@
       "cost": 89878.8691,
       "fees": 67.3586,
       "slippage": 90.5219,
+      "requested_qty": 701,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-09-01T16:49:18.500970+00:00",
+      "side": "BUY",
+      "symbol": "COMI.CA",
+      "qty": 592,
+      "price": 136.4365,
+      "ref_price": 136.3,
+      "cost": 80831.0092,
+      "fees": 60.5778,
+      "slippage": 80.8296,
+      "requested_qty": 592,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-09-01T16:49:19.779093+00:00",
+      "side": "SELL",
+      "symbol": "SWDY.CA",
+      "qty": 701,
+      "price": 125.823,
+      "ref_price": 125.95,
+      "proceeds": 88135.7481,
+      "fees": 66.1514,
+      "slippage": 89.0484,
+      "pnl": -1743.121,
       "requested_qty": 701,
       "adv_known": true
     }
@@ -615,6 +642,32 @@
           "current_price": 127.99,
           "market_value": 89720.99,
           "unrealized_pnl": -157.88,
+          "side": "long"
+        }
+      ]
+    },
+    {
+      "date": "2026-09-01",
+      "equity": 996052.45,
+      "cash": 816616.85,
+      "pnl": -3947.55,
+      "positions": [
+        {
+          "symbol": "TMGH.CA",
+          "qty": 1018.0,
+          "avg_entry": 97.9717,
+          "current_price": 97.0,
+          "market_value": 98746.0,
+          "unrealized_pnl": -989.17,
+          "side": "long"
+        },
+        {
+          "symbol": "COMI.CA",
+          "qty": 592.0,
+          "avg_entry": 136.5389,
+          "current_price": 136.3,
+          "market_value": 80689.6,
+          "unrealized_pnl": -141.41,
           "side": "long"
         }
       ]
