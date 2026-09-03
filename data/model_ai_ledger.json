@@ -1918,6 +1918,68 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-09-03",
+      "equity": 98146.26,
+      "cash": 34256.76,
+      "pnl": -1853.7400000000052,
+      "positions": [
+        {
+          "symbol": "AMGN",
+          "qty": 21.0,
+          "avg_entry": 440.52,
+          "current_price": 443.0,
+          "market_value": 9303.0,
+          "unrealized_pnl": 52.08,
+          "side": "long"
+        },
+        {
+          "symbol": "BAC",
+          "qty": 272.0,
+          "avg_entry": 63.961479,
+          "current_price": 63.0499,
+          "market_value": 17149.5728,
+          "unrealized_pnl": -247.949488,
+          "side": "long"
+        },
+        {
+          "symbol": "JNJ",
+          "qty": 49.0,
+          "avg_entry": 266.002449,
+          "current_price": 278.43,
+          "market_value": 13643.07,
+          "unrealized_pnl": 608.949999,
+          "side": "long"
+        },
+        {
+          "symbol": "LLY",
+          "qty": 5.0,
+          "avg_entry": 1214.27,
+          "current_price": 1159.5497,
+          "market_value": 5797.7485,
+          "unrealized_pnl": -273.6015,
+          "side": "long"
+        },
+        {
+          "symbol": "MRK",
+          "qty": 41.0,
+          "avg_entry": 134.249756,
+          "current_price": 152.34,
+          "market_value": 6245.94,
+          "unrealized_pnl": 741.700004,
+          "side": "long"
+        },
+        {
+          "symbol": "TMO",
+          "qty": 19.0,
+          "avg_entry": 619.28,
+          "current_price": 618.43,
+          "market_value": 11750.17,
+          "unrealized_pnl": -16.15,
+          "side": "long"
+        }
+      ]
     }
   ]
 }
