@@ -732,6 +732,23 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-09-06",
+      "equity": 998741.84,
+      "cash": 897991.84,
+      "pnl": -1258.16,
+      "positions": [
+        {
+          "symbol": "SWDY.CA",
+          "qty": 775.0,
+          "avg_entry": 128.5763,
+          "current_price": 130.0,
+          "market_value": 100750.0,
+          "unrealized_pnl": 1103.39,
+          "side": "long"
+        }
+      ]
     }
   ],
   "extra": {}
