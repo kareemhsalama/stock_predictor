@@ -4,23 +4,15 @@
   "market": "EGX",
   "currency": "EGP",
   "initial_budget": 1000000.0,
-  "cash": 727491.4087246079,
+  "cash": 918855.9494013954,
   "positions": {
-    "SWDY.CA": {
-      "qty": 775,
-      "avg_price": 128.57627726065377
-    },
-    "COMI.CA": {
-      "qty": 631,
-      "avg_price": 142.24888972949748
-    },
     "TMGH.CA": {
       "qty": 806,
       "avg_price": 100.17541102938144
     }
   },
-  "fees_paid": 891.8338,
-  "slippage_paid": 1195.4134,
+  "fees_paid": 1035.4649,
+  "slippage_paid": 1388.5459,
   "cost_model_from": "2026-08-20",
   "cost_model": {
     "commission_bps": 5.0,
@@ -305,6 +297,34 @@
       "fees": 60.5107,
       "slippage": 80.8706,
       "requested_qty": 806,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-09-09T16:49:30.958385+00:00",
+      "side": "SELL",
+      "symbol": "COMI.CA",
+      "qty": 631,
+      "price": 138.4112,
+      "ref_price": 138.55,
+      "proceeds": 87271.963,
+      "fees": 65.5031,
+      "slippage": 87.5858,
+      "pnl": -2487.0864,
+      "requested_qty": 631,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-09-09T16:49:32.095168+00:00",
+      "side": "SELL",
+      "symbol": "SWDY.CA",
+      "qty": 775,
+      "price": 134.4138,
+      "ref_price": 134.55,
+      "proceeds": 104092.5777,
+      "fees": 78.128,
+      "slippage": 105.5467,
+      "pnl": 4445.9628,
+      "requested_qty": 775,
       "adv_known": true
     }
   ],
@@ -850,6 +870,23 @@
           "current_price": 100.0,
           "market_value": 80600.0,
           "unrealized_pnl": -141.38,
+          "side": "long"
+        }
+      ]
+    },
+    {
+      "date": "2026-09-09",
+      "equity": 997860.07,
+      "cash": 918855.95,
+      "pnl": -2139.93,
+      "positions": [
+        {
+          "symbol": "TMGH.CA",
+          "qty": 806.0,
+          "avg_entry": 100.1754,
+          "current_price": 98.02,
+          "market_value": 79004.12,
+          "unrealized_pnl": -1737.26,
           "side": "long"
         }
       ]
