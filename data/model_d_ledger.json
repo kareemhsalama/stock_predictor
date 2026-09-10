@@ -573,6 +573,23 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-09-10",
+      "equity": 100313.64,
+      "cash": 96033.98,
+      "pnl": 313.6399999999994,
+      "positions": [
+        {
+          "symbol": "HD",
+          "qty": 14.0,
+          "avg_entry": 320.5,
+          "current_price": 305.69,
+          "market_value": 4279.66,
+          "unrealized_pnl": -207.34,
+          "side": "long"
+        }
+      ]
     }
   ]
 }
