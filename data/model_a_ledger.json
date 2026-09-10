@@ -1371,6 +1371,32 @@
       "cash": 102479.01,
       "pnl": 2479.0099999999948,
       "positions": []
+    },
+    {
+      "date": "2026-09-10",
+      "equity": 102489.28,
+      "cash": 83431.25,
+      "pnl": 2489.279999999999,
+      "positions": [
+        {
+          "symbol": "AAPL",
+          "qty": 31.0,
+          "avg_entry": 325.16,
+          "current_price": 325.91,
+          "market_value": 10103.21,
+          "unrealized_pnl": 23.25,
+          "side": "long"
+        },
+        {
+          "symbol": "GOOGL",
+          "qty": 27.0,
+          "avg_entry": 332.140741,
+          "current_price": 331.66,
+          "market_value": 8954.82,
+          "unrealized_pnl": -12.980007,
+          "side": "long"
+        }
+      ]
     }
   ]
 }
