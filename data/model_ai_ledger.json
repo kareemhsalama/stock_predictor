@@ -2148,6 +2148,59 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-09-10",
+      "equity": 95579.73,
+      "cash": 42538.75,
+      "pnl": -4420.270000000004,
+      "positions": [
+        {
+          "symbol": "BAC",
+          "qty": 272.0,
+          "avg_entry": 63.961479,
+          "current_price": 62.5,
+          "market_value": 17000.0,
+          "unrealized_pnl": -397.522288,
+          "side": "long"
+        },
+        {
+          "symbol": "JNJ",
+          "qty": 49.0,
+          "avg_entry": 266.002449,
+          "current_price": 265.89,
+          "market_value": 13028.61,
+          "unrealized_pnl": -5.510001,
+          "side": "long"
+        },
+        {
+          "symbol": "LLY",
+          "qty": 5.0,
+          "avg_entry": 1214.27,
+          "current_price": 1124.26,
+          "market_value": 5621.3,
+          "unrealized_pnl": -450.05,
+          "side": "long"
+        },
+        {
+          "symbol": "MRK",
+          "qty": 41.0,
+          "avg_entry": 134.249756,
+          "current_price": 144.65,
+          "market_value": 5930.65,
+          "unrealized_pnl": 426.410004,
+          "side": "long"
+        },
+        {
+          "symbol": "TMO",
+          "qty": 19.0,
+          "avg_entry": 619.28,
+          "current_price": 603.18,
+          "market_value": 11460.42,
+          "unrealized_pnl": -305.9,
+          "side": "long"
+        }
+      ]
     }
   ]
 }
