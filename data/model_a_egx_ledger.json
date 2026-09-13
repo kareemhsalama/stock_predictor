@@ -4,19 +4,15 @@
   "market": "EGX",
   "currency": "EGP",
   "initial_budget": 1000000.0,
-  "cash": 816144.7794140067,
+  "cash": 904257.6546316273,
   "positions": {
-    "COMI.CA": {
-      "qty": 658,
-      "avg_price": 139.4439866208044
-    },
-    "SWDY.CA": {
-      "qty": 691,
-      "avg_price": 131.13052311764352
+    "TMGH.CA": {
+      "qty": 913,
+      "avg_price": 99.22376835053166
     }
   },
-  "fees_paid": 1231.9219,
-  "slippage_paid": 1651.7652,
+  "fees_paid": 1433.9432,
+  "slippage_paid": 1922.5747,
   "cost_model_from": "2026-08-20",
   "cost_model": {
     "commission_bps": 5.0,
@@ -368,6 +364,47 @@
       "cost": 90611.1915,
       "fees": 67.9075,
       "slippage": 91.3882,
+      "requested_qty": 691,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-09-13T16:32:53.520535+00:00",
+      "side": "SELL",
+      "symbol": "COMI.CA",
+      "qty": 658,
+      "price": 138.0316,
+      "ref_price": 138.17,
+      "proceeds": 90756.6502,
+      "fees": 68.1186,
+      "slippage": 91.09,
+      "pnl": -997.493,
+      "requested_qty": 658,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-09-13T16:32:54.434809+00:00",
+      "side": "BUY",
+      "symbol": "TMGH.CA",
+      "qty": 913,
+      "price": 99.1494,
+      "ref_price": 99.05,
+      "cost": 90591.3005,
+      "fees": 67.8926,
+      "slippage": 90.7552,
+      "requested_qty": 913,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-09-13T16:32:55.259595+00:00",
+      "side": "SELL",
+      "symbol": "SWDY.CA",
+      "qty": 691,
+      "price": 127.3713,
+      "ref_price": 127.5,
+      "proceeds": 87947.5255,
+      "fees": 66.0102,
+      "slippage": 88.9643,
+      "pnl": -2663.6659,
       "requested_qty": 691,
       "adv_known": true
     }
@@ -957,6 +994,23 @@
           "current_price": 130.9,
           "market_value": 90451.9,
           "unrealized_pnl": -159.3,
+          "side": "long"
+        }
+      ]
+    },
+    {
+      "date": "2026-09-13",
+      "equity": 994690.3,
+      "cash": 904257.65,
+      "pnl": -5309.7,
+      "positions": [
+        {
+          "symbol": "TMGH.CA",
+          "qty": 913.0,
+          "avg_entry": 99.2238,
+          "current_price": 99.05,
+          "market_value": 90432.65,
+          "unrealized_pnl": -158.65,
           "side": "long"
         }
       ]
