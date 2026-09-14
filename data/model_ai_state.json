@@ -11,13 +11,29 @@
       "entry_date": "2026-07-30",
       "peak_price": 154.715
     },
-    "BAC": {
-      "entry_date": "2026-08-10",
-      "peak_price": 64.795
-    },
     "TMO": {
       "entry_date": "2026-08-24",
       "peak_price": 632.39
+    },
+    "KO": {
+      "entry_date": "2026-09-14",
+      "peak_price": 89.2699966430664
+    },
+    "MSFT": {
+      "entry_date": "2026-09-14",
+      "peak_price": 507.239990234375
+    },
+    "XOM": {
+      "entry_date": "2026-09-14",
+      "peak_price": 164.4149932861328
+    },
+    "LLY": {
+      "entry_date": "2026-09-14",
+      "peak_price": 1140.219970703125
+    },
+    "AMD": {
+      "entry_date": "2026-09-14",
+      "peak_price": 495.0
     }
   }
 }
