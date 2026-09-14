@@ -2139,6 +2139,59 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-09-14",
+      "equity": 1001154.69,
+      "cash": 315150.7,
+      "pnl": 1154.69,
+      "positions": [
+        {
+          "symbol": "TMGH.CA",
+          "qty": 1751.0,
+          "avg_entry": 99.0579,
+          "current_price": 97.89,
+          "market_value": 171405.39,
+          "unrealized_pnl": -2045.06,
+          "side": "long"
+        },
+        {
+          "symbol": "EFID.CA",
+          "qty": 5198.0,
+          "avg_entry": 31.1874,
+          "current_price": 30.9,
+          "market_value": 160618.2,
+          "unrealized_pnl": -1494.0,
+          "side": "long"
+        },
+        {
+          "symbol": "SWDY.CA",
+          "qty": 660.0,
+          "avg_entry": 116.5749,
+          "current_price": 127.1,
+          "market_value": 83886.0,
+          "unrealized_pnl": 6946.57,
+          "side": "long"
+        },
+        {
+          "symbol": "PHDC.CA",
+          "qty": 12008.0,
+          "avg_entry": 14.8661,
+          "current_price": 14.2,
+          "market_value": 170513.6,
+          "unrealized_pnl": -7998.96,
+          "side": "long"
+        },
+        {
+          "symbol": "ABUK.CA",
+          "qty": 1104.0,
+          "avg_entry": 92.5526,
+          "current_price": 90.2,
+          "market_value": 99580.8,
+          "unrealized_pnl": -2597.28,
+          "side": "long"
+        }
+      ]
     }
   ],
   "extra": {
