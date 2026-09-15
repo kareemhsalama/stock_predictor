@@ -1057,6 +1057,32 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-09-15",
+      "equity": 990622.32,
+      "cash": 813898.41,
+      "pnl": -9377.68,
+      "positions": [
+        {
+          "symbol": "TMGH.CA",
+          "qty": 913.0,
+          "avg_entry": 99.2238,
+          "current_price": 96.75,
+          "market_value": 88332.75,
+          "unrealized_pnl": -2258.55,
+          "side": "long"
+        },
+        {
+          "symbol": "COMI.CA",
+          "qty": 663.0,
+          "avg_entry": 136.2884,
+          "current_price": 133.32,
+          "market_value": 88391.16,
+          "unrealized_pnl": -1968.08,
+          "side": "long"
+        }
+      ]
     }
   ],
   "extra": {}
