@@ -4,7 +4,7 @@
   "market": "EGX",
   "currency": "EGP",
   "initial_budget": 1000000.0,
-  "cash": 471124.7039190626,
+  "cash": 636663.6818522473,
   "positions": {
     "TMGH.CA": {
       "qty": 1751,
@@ -14,17 +14,13 @@
       "qty": 660,
       "avg_price": 116.57488543317008
     },
-    "PHDC.CA": {
-      "qty": 12008,
-      "avg_price": 14.866135838421675
-    },
     "ABUK.CA": {
       "qty": 1104,
       "avg_price": 92.55260243540496
     }
   },
-  "fees_paid": 995.0631,
-  "slippage_paid": 1330.6282,
+  "fees_paid": 1119.3105,
+  "slippage_paid": 1497.8879,
   "cost_model_from": "2026-08-20",
   "cost_model": {
     "commission_bps": 5.0,
@@ -400,6 +396,20 @@
       "slippage": 160.8,
       "pnl": -6138.1887,
       "requested_qty": 5198,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-09-16T17:14:49.720488+00:00",
+      "side": "SELL",
+      "symbol": "PHDC.CA",
+      "qty": 12008,
+      "price": 13.7961,
+      "ref_price": 13.81,
+      "proceeds": 165538.9779,
+      "fees": 124.2474,
+      "slippage": 167.2597,
+      "pnl": -12973.5812,
+      "requested_qty": 12008,
       "adv_known": true
     }
   ],
@@ -2246,13 +2256,47 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-09-16",
+      "equity": 984526.22,
+      "cash": 636663.68,
+      "pnl": -15473.78,
+      "positions": [
+        {
+          "symbol": "TMGH.CA",
+          "qty": 1751.0,
+          "avg_entry": 99.0579,
+          "current_price": 95.94,
+          "market_value": 167990.94,
+          "unrealized_pnl": -5459.51,
+          "side": "long"
+        },
+        {
+          "symbol": "SWDY.CA",
+          "qty": 660.0,
+          "avg_entry": 116.5749,
+          "current_price": 125.5,
+          "market_value": 82830.0,
+          "unrealized_pnl": 5890.58,
+          "side": "long"
+        },
+        {
+          "symbol": "ABUK.CA",
+          "qty": 1104.0,
+          "avg_entry": 92.5526,
+          "current_price": 87.9,
+          "market_value": 97041.6,
+          "unrealized_pnl": -5136.47,
+          "side": "long"
+        }
+      ]
     }
   ],
   "extra": {
     "peak_price": {
       "TMGH.CA": 100.0,
       "SWDY.CA": 136.1999969482422,
-      "PHDC.CA": 15.0,
       "ABUK.CA": 94.5
     },
     "bootstrapped": true
