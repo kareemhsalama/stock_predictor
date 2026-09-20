@@ -4,23 +4,23 @@
   "market": "EGX",
   "currency": "EGP",
   "initial_budget": 1000000.0,
-  "cash": 636663.6818522473,
+  "cash": 562666.2627724075,
   "positions": {
-    "TMGH.CA": {
-      "qty": 1751,
-      "avg_price": 99.05794031370013
-    },
     "SWDY.CA": {
-      "qty": 660,
-      "avg_price": 116.57488543317008
+      "qty": 1125,
+      "avg_price": 119.92040218011898
     },
     "ABUK.CA": {
-      "qty": 1104,
-      "avg_price": 92.55260243540496
+      "qty": 1573,
+      "avg_price": 91.53990167483751
+    },
+    "EFID.CA": {
+      "qty": 4546,
+      "avg_price": 30.854637934107963
     }
   },
-  "fees_paid": 1119.3105,
-  "slippage_paid": 1497.8879,
+  "fees_paid": 1423.8466,
+  "slippage_paid": 1908.7258,
   "cost_model_from": "2026-08-20",
   "cost_model": {
     "commission_bps": 5.0,
@@ -410,6 +410,59 @@
       "slippage": 167.2597,
       "pnl": -12973.5812,
       "requested_qty": 12008,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-09-20T16:26:30.012283+00:00",
+      "side": "SELL",
+      "symbol": "TMGH.CA",
+      "qty": 1751,
+      "price": 94.9044,
+      "ref_price": 95.0,
+      "proceeds": 166052.9853,
+      "fees": 124.6332,
+      "slippage": 167.3815,
+      "pnl": -7397.4682,
+      "requested_qty": 1751,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-09-20T16:26:30.434258+00:00",
+      "side": "BUY",
+      "symbol": "EFID.CA",
+      "qty": 4546,
+      "price": 30.8315,
+      "ref_price": 30.8,
+      "cost": 140265.184,
+      "fees": 105.12,
+      "slippage": 143.2675,
+      "requested_qty": 4546,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-09-20T16:26:30.920808+00:00",
+      "side": "BUY",
+      "symbol": "SWDY.CA",
+      "qty": 465,
+      "price": 124.5754,
+      "ref_price": 124.45,
+      "cost": 57971.0281,
+      "fees": 43.4457,
+      "slippage": 58.3338,
+      "requested_qty": 465,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-09-20T16:26:31.272669+00:00",
+      "side": "BUY",
+      "symbol": "ABUK.CA",
+      "qty": 469,
+      "price": 89.0892,
+      "ref_price": 89.0,
+      "cost": 41814.1922,
+      "fees": 31.3371,
+      "slippage": 41.8551,
+      "requested_qty": 469,
       "adv_known": true
     }
   ],
@@ -2323,6 +2376,41 @@
           "current_price": 89.0,
           "market_value": 98256.0,
           "unrealized_pnl": -3922.07,
+          "side": "long"
+        }
+      ]
+    },
+    {
+      "date": "2026-09-20",
+      "equity": 982686.31,
+      "cash": 562666.26,
+      "pnl": -17313.69,
+      "positions": [
+        {
+          "symbol": "SWDY.CA",
+          "qty": 1125.0,
+          "avg_entry": 119.9204,
+          "current_price": 124.45,
+          "market_value": 140006.25,
+          "unrealized_pnl": 5095.79,
+          "side": "long"
+        },
+        {
+          "symbol": "ABUK.CA",
+          "qty": 1573.0,
+          "avg_entry": 91.5399,
+          "current_price": 89.0,
+          "market_value": 139997.0,
+          "unrealized_pnl": -3995.27,
+          "side": "long"
+        },
+        {
+          "symbol": "EFID.CA",
+          "qty": 4546.0,
+          "avg_entry": 30.8546,
+          "current_price": 30.8,
+          "market_value": 140016.8,
+          "unrealized_pnl": -248.39,
           "side": "long"
         }
       ]
