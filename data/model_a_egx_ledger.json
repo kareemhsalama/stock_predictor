@@ -1144,6 +1144,23 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-09-20",
+      "equity": 988858.61,
+      "cash": 890153.61,
+      "pnl": -11141.39,
+      "positions": [
+        {
+          "symbol": "TMGH.CA",
+          "qty": 1039.0,
+          "avg_entry": 95.1667,
+          "current_price": 95.0,
+          "market_value": 98705.0,
+          "unrealized_pnl": -173.19,
+          "side": "long"
+        }
+      ]
     }
   ],
   "extra": {}
