@@ -4,15 +4,10 @@
   "market": "EGX",
   "currency": "EGP",
   "initial_budget": 1000000.0,
-  "cash": 890153.6147058931,
-  "positions": {
-    "TMGH.CA": {
-      "qty": 1039,
-      "avg_price": 95.16668634012025
-    }
-  },
-  "fees_paid": 1707.2135,
-  "slippage_paid": 2287.9144,
+  "cash": 988374.4398310411,
+  "positions": {},
+  "fees_paid": 1780.9344,
+  "slippage_paid": 2386.6652,
   "cost_model_from": "2026-08-20",
   "cost_model": {
     "commission_bps": 5.0,
@@ -459,6 +454,20 @@
       "cost": 98878.1871,
       "fees": 74.1031,
       "slippage": 99.084,
+      "requested_qty": 1039,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-09-21T18:16:29.629418+00:00",
+      "side": "SELL",
+      "symbol": "TMGH.CA",
+      "qty": 1039,
+      "price": 94.605,
+      "ref_price": 94.7,
+      "proceeds": 98220.8251,
+      "fees": 73.7209,
+      "slippage": 98.7508,
+      "pnl": -657.362,
       "requested_qty": 1039,
       "adv_known": true
     }
@@ -1161,6 +1170,13 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-09-21",
+      "equity": 988374.44,
+      "cash": 988374.44,
+      "pnl": -11625.56,
+      "positions": []
     }
   ],
   "extra": {}
