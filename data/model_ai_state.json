@@ -15,14 +15,6 @@
       "entry_date": "2026-08-24",
       "peak_price": 658.945
     },
-    "KO": {
-      "entry_date": "2026-09-14",
-      "peak_price": 89.2699966430664
-    },
-    "MSFT": {
-      "entry_date": "2026-09-14",
-      "peak_price": 507.239990234375
-    },
     "XOM": {
       "entry_date": "2026-09-14",
       "peak_price": 168.83
@@ -34,6 +26,14 @@
     "AMD": {
       "entry_date": "2026-09-14",
       "peak_price": 546.49
+    },
+    "COP": {
+      "entry_date": "2026-09-21",
+      "peak_price": 127.9000015258789
+    },
+    "AMGN": {
+      "entry_date": "2026-09-21",
+      "peak_price": 393.45001220703125
     }
   }
 }
