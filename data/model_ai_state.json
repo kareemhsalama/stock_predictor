@@ -21,11 +21,11 @@
     },
     "LLY": {
       "entry_date": "2026-09-14",
-      "peak_price": 1155.26
+      "peak_price": 1174.725
     },
     "AMD": {
       "entry_date": "2026-09-14",
-      "peak_price": 546.49
+      "peak_price": 621.995
     },
     "COP": {
       "entry_date": "2026-09-21",
@@ -33,7 +33,7 @@
     },
     "AMGN": {
       "entry_date": "2026-09-21",
-      "peak_price": 393.45001220703125
+      "peak_price": 410.21
     }
   }
 }
