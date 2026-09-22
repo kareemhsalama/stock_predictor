@@ -737,6 +737,32 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-09-21",
+      "equity": 100086.75,
+      "cash": 91279.48,
+      "pnl": 86.75,
+      "positions": [
+        {
+          "symbol": "BAC",
+          "qty": 80.0,
+          "avg_entry": 59.43125,
+          "current_price": 58.0091,
+          "market_value": 4640.728,
+          "unrealized_pnl": -113.772,
+          "side": "long"
+        },
+        {
+          "symbol": "HD",
+          "qty": 14.0,
+          "avg_entry": 320.5,
+          "current_price": 297.61,
+          "market_value": 4166.54,
+          "unrealized_pnl": -320.46,
+          "side": "long"
+        }
+      ]
     }
   ]
 }
