@@ -1604,6 +1604,23 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-09-24",
+      "equity": 102906.88,
+      "cash": 93844.6,
+      "pnl": 2906.8800000000047,
+      "positions": [
+        {
+          "symbol": "AAPL",
+          "qty": 27.0,
+          "avg_entry": 334.46,
+          "current_price": 335.64,
+          "market_value": 9062.28,
+          "unrealized_pnl": 31.86,
+          "side": "long"
+        }
+      ]
     }
   ]
 }
