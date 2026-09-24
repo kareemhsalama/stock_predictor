@@ -2519,6 +2519,41 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-09-24",
+      "equity": 986010.3,
+      "cash": 562666.26,
+      "pnl": -13989.7,
+      "positions": [
+        {
+          "symbol": "SWDY.CA",
+          "qty": 1125.0,
+          "avg_entry": 119.9204,
+          "current_price": 124.0,
+          "market_value": 139500.0,
+          "unrealized_pnl": 4589.55,
+          "side": "long"
+        },
+        {
+          "symbol": "ABUK.CA",
+          "qty": 1573.0,
+          "avg_entry": 91.5399,
+          "current_price": 92.88,
+          "market_value": 146100.24,
+          "unrealized_pnl": 2107.97,
+          "side": "long"
+        },
+        {
+          "symbol": "EFID.CA",
+          "qty": 4546.0,
+          "avg_entry": 30.8546,
+          "current_price": 30.3,
+          "market_value": 137743.8,
+          "unrealized_pnl": -2521.39,
+          "side": "long"
+        }
+      ]
     }
   ],
   "extra": {
