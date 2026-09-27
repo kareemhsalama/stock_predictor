@@ -4,15 +4,23 @@
   "market": "EGX",
   "currency": "EGP",
   "initial_budget": 1000000.0,
-  "cash": 889564.5808576858,
+  "cash": 720628.4525263375,
   "positions": {
     "COMI.CA": {
       "qty": 770,
       "avg_price": 128.32449217318876
+    },
+    "TMGH.CA": {
+      "qty": 967,
+      "avg_price": 91.96100256489039
+    },
+    "SWDY.CA": {
+      "qty": 674,
+      "avg_price": 118.70895971973187
     }
   },
-  "fees_paid": 1854.9863,
-  "slippage_paid": 2485.4676,
+  "fees_paid": 1981.5934,
+  "slippage_paid": 2655.3858,
   "cost_model_from": "2026-08-20",
   "cost_model": {
     "commission_bps": 5.0,
@@ -487,6 +495,32 @@
       "fees": 74.0519,
       "slippage": 98.8024,
       "requested_qty": 770,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-09-27T17:08:14.593304+00:00",
+      "side": "BUY",
+      "symbol": "TMGH.CA",
+      "qty": 967,
+      "price": 91.8921,
+      "ref_price": 91.8,
+      "cost": 88926.2895,
+      "fees": 66.6447,
+      "slippage": 89.0418,
+      "requested_qty": 967,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-09-27T17:08:15.406281+00:00",
+      "side": "BUY",
+      "symbol": "SWDY.CA",
+      "qty": 674,
+      "price": 118.62,
+      "ref_price": 118.5,
+      "cost": 80009.8389,
+      "fees": 59.9624,
+      "slippage": 80.8764,
+      "requested_qty": 674,
       "adv_known": true
     }
   ],
@@ -1223,6 +1257,41 @@
           "current_price": 128.1,
           "market_value": 98637.0,
           "unrealized_pnl": -172.85,
+          "side": "long"
+        }
+      ]
+    },
+    {
+      "date": "2026-09-27",
+      "equity": 987982.05,
+      "cash": 720628.45,
+      "pnl": -12017.95,
+      "positions": [
+        {
+          "symbol": "COMI.CA",
+          "qty": 770.0,
+          "avg_entry": 128.3245,
+          "current_price": 128.2,
+          "market_value": 98714.0,
+          "unrealized_pnl": -95.86,
+          "side": "long"
+        },
+        {
+          "symbol": "TMGH.CA",
+          "qty": 967.0,
+          "avg_entry": 91.961,
+          "current_price": 91.8,
+          "market_value": 88770.6,
+          "unrealized_pnl": -155.69,
+          "side": "long"
+        },
+        {
+          "symbol": "SWDY.CA",
+          "qty": 674.0,
+          "avg_entry": 118.709,
+          "current_price": 118.5,
+          "market_value": 79869.0,
+          "unrealized_pnl": -140.84,
           "side": "long"
         }
       ]
