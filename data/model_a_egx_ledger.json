@@ -4,23 +4,19 @@
   "market": "EGX",
   "currency": "EGP",
   "initial_budget": 1000000.0,
-  "cash": 720628.4525263375,
+  "cash": 807892.0771484773,
   "positions": {
     "COMI.CA": {
       "qty": 770,
       "avg_price": 128.32449217318876
-    },
-    "TMGH.CA": {
-      "qty": 967,
-      "avg_price": 91.96100256489039
     },
     "SWDY.CA": {
       "qty": 674,
       "avg_price": 118.70895971973187
     }
   },
-  "fees_paid": 1981.5934,
-  "slippage_paid": 2655.3858,
+  "fees_paid": 2047.0902,
+  "slippage_paid": 2743.0658,
   "cost_model_from": "2026-08-20",
   "cost_model": {
     "commission_bps": 5.0,
@@ -521,6 +517,20 @@
       "fees": 59.9624,
       "slippage": 80.8764,
       "requested_qty": 674,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-09-28T19:46:56.934805+00:00",
+      "side": "SELL",
+      "symbol": "TMGH.CA",
+      "qty": 967,
+      "price": 90.3093,
+      "ref_price": 90.4,
+      "proceeds": 87263.6246,
+      "fees": 65.4968,
+      "slippage": 87.68,
+      "pnl": -1662.6649,
+      "requested_qty": 967,
       "adv_known": true
     }
   ],
@@ -1292,6 +1302,32 @@
           "current_price": 118.5,
           "market_value": 79869.0,
           "unrealized_pnl": -140.84,
+          "side": "long"
+        }
+      ]
+    },
+    {
+      "date": "2026-09-28",
+      "equity": 983487.18,
+      "cash": 807892.08,
+      "pnl": -16512.82,
+      "positions": [
+        {
+          "symbol": "COMI.CA",
+          "qty": 770.0,
+          "avg_entry": 128.3245,
+          "current_price": 128.74,
+          "market_value": 99129.8,
+          "unrealized_pnl": 319.95,
+          "side": "long"
+        },
+        {
+          "symbol": "SWDY.CA",
+          "qty": 674.0,
+          "avg_entry": 118.709,
+          "current_price": 113.45,
+          "market_value": 76465.3,
+          "unrealized_pnl": -3544.54,
           "side": "long"
         }
       ]
