@@ -894,6 +894,41 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-09-28",
+      "equity": 99746.99,
+      "cash": 86849.42,
+      "pnl": -253.00999999999476,
+      "positions": [
+        {
+          "symbol": "BAC",
+          "qty": 80.0,
+          "avg_entry": 59.43125,
+          "current_price": 55.54,
+          "market_value": 4443.2,
+          "unrealized_pnl": -311.3,
+          "side": "long"
+        },
+        {
+          "symbol": "HD",
+          "qty": 14.0,
+          "avg_entry": 320.5,
+          "current_price": 290.76,
+          "market_value": 4070.64,
+          "unrealized_pnl": -416.36,
+          "side": "long"
+        },
+        {
+          "symbol": "JPM",
+          "qty": 13.0,
+          "avg_entry": 337.3,
+          "current_price": 337.2101,
+          "market_value": 4383.7313,
+          "unrealized_pnl": -1.1687,
+          "side": "long"
+        }
+      ]
     }
   ]
 }
