@@ -4,19 +4,15 @@
   "market": "EGX",
   "currency": "EGP",
   "initial_budget": 1000000.0,
-  "cash": 688822.8800846547,
+  "cash": 798033.675505515,
   "positions": {
     "ABUK.CA": {
       "qty": 1326,
       "avg_price": 91.53990167483751
-    },
-    "SWDY.CA": {
-      "qty": 1013,
-      "avg_price": 118.70971208080617
     }
   },
-  "fees_paid": 1701.9028,
-  "slippage_paid": 2281.6171,
+  "fees_paid": 1783.8724,
+  "slippage_paid": 2392.8521,
   "cost_model_from": "2026-08-20",
   "cost_model": {
     "commission_bps": 5.0,
@@ -528,6 +524,20 @@
       "slippage": 78.0055,
       "pnl": -48574.1135,
       "requested_qty": 4070,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-09-30T18:06:16.498435+00:00",
+      "side": "SELL",
+      "symbol": "SWDY.CA",
+      "qty": 1013,
+      "price": 107.8902,
+      "ref_price": 108.0,
+      "proceeds": 109210.7954,
+      "fees": 81.9696,
+      "slippage": 111.235,
+      "pnl": -11042.1429,
+      "requested_qty": 1013,
       "adv_known": true
     }
   ],
@@ -2715,12 +2725,28 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-09-30",
+      "equity": 915517.28,
+      "cash": 798033.68,
+      "pnl": -84482.72,
+      "positions": [
+        {
+          "symbol": "ABUK.CA",
+          "qty": 1326.0,
+          "avg_entry": 91.5399,
+          "current_price": 88.6,
+          "market_value": 117483.6,
+          "unrealized_pnl": -3898.31,
+          "side": "long"
+        }
+      ]
     }
   ],
   "extra": {
     "peak_price": {
-      "ABUK.CA": 94.5,
-      "SWDY.CA": 113.44999694824219
+      "ABUK.CA": 94.5
     },
     "bootstrapped": true
   }
