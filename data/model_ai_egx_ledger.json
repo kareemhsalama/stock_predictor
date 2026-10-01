@@ -2742,6 +2742,23 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-10-01",
+      "equity": 911777.96,
+      "cash": 798033.68,
+      "pnl": -88222.04,
+      "positions": [
+        {
+          "symbol": "ABUK.CA",
+          "qty": 1326.0,
+          "avg_entry": 91.5399,
+          "current_price": 85.78,
+          "market_value": 113744.28,
+          "unrealized_pnl": -7637.63,
+          "side": "long"
+        }
+      ]
     }
   ],
   "extra": {
