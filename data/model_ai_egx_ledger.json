@@ -4,15 +4,19 @@
   "market": "EGX",
   "currency": "EGP",
   "initial_budget": 1000000.0,
-  "cash": 798033.675505515,
+  "cash": 890622.5543787684,
   "positions": {
     "ABUK.CA": {
-      "qty": 1326,
+      "qty": 130,
       "avg_price": 91.53990167483751
+    },
+    "SWDY.CA": {
+      "qty": 94,
+      "avg_price": 120.25659590319549
     }
   },
-  "fees_paid": 1783.8724,
-  "slippage_paid": 2392.8521,
+  "fees_paid": 1874.6735,
+  "slippage_paid": 2509.0882,
   "cost_model_from": "2026-08-20",
   "cost_model": {
     "commission_bps": 5.0,
@@ -538,6 +542,33 @@
       "slippage": 111.235,
       "pnl": -11042.1429,
       "requested_qty": 1013,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-10-04T16:57:37.325526+00:00",
+      "side": "SELL",
+      "symbol": "ABUK.CA",
+      "qty": 1196,
+      "price": 86.9323,
+      "ref_price": 87.02,
+      "proceeds": 103892.9989,
+      "fees": 77.9782,
+      "slippage": 104.9389,
+      "pnl": -5588.7235,
+      "requested_qty": 1196,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-10-04T16:57:37.803726+00:00",
+      "side": "BUY",
+      "symbol": "SWDY.CA",
+      "qty": 94,
+      "price": 120.1202,
+      "ref_price": 120.0,
+      "cost": 11304.12,
+      "fees": 12.8228,
+      "slippage": 11.2972,
+      "requested_qty": 94,
       "adv_known": true
     }
   ],
@@ -2756,6 +2787,32 @@
           "current_price": 85.78,
           "market_value": 113744.28,
           "unrealized_pnl": -7637.63,
+          "side": "long"
+        }
+      ]
+    },
+    {
+      "date": "2026-10-04",
+      "equity": 913215.15,
+      "cash": 890622.55,
+      "pnl": -86784.85,
+      "positions": [
+        {
+          "symbol": "ABUK.CA",
+          "qty": 130.0,
+          "avg_entry": 91.5399,
+          "current_price": 87.02,
+          "market_value": 11312.6,
+          "unrealized_pnl": -587.59,
+          "side": "long"
+        },
+        {
+          "symbol": "SWDY.CA",
+          "qty": 94.0,
+          "avg_entry": 120.2566,
+          "current_price": 120.0,
+          "market_value": 11280.0,
+          "unrealized_pnl": -24.12,
           "side": "long"
         }
       ]
