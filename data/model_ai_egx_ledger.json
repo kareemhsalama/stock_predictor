@@ -4,19 +4,23 @@
   "market": "EGX",
   "currency": "EGP",
   "initial_budget": 1000000.0,
-  "cash": 890622.5543787684,
+  "cash": 772342.7207844891,
   "positions": {
     "ABUK.CA": {
-      "qty": 130,
-      "avg_price": 91.53990167483751
+      "qty": 521,
+      "avg_price": 90.50273881675807
     },
     "SWDY.CA": {
-      "qty": 94,
-      "avg_price": 120.25659590319549
+      "qty": 404,
+      "avg_price": 117.14672683663869
+    },
+    "HRHO.CA": {
+      "qty": 1766,
+      "avg_price": 26.61661169953319
     }
   },
-  "fees_paid": 1874.6735,
-  "slippage_paid": 2509.0882,
+  "fees_paid": 1963.3169,
+  "slippage_paid": 2627.6589,
   "cost_model_from": "2026-08-20",
   "cost_model": {
     "commission_bps": 5.0,
@@ -569,6 +573,45 @@
       "fees": 12.8228,
       "slippage": 11.2972,
       "requested_qty": 94,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-10-11T17:45:49.415436+00:00",
+      "side": "BUY",
+      "symbol": "ABUK.CA",
+      "qty": 391,
+      "price": 90.0903,
+      "ref_price": 90.0,
+      "cost": 35251.7397,
+      "fees": 26.419,
+      "slippage": 35.3207,
+      "requested_qty": 391,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-10-11T17:45:49.805654+00:00",
+      "side": "BUY",
+      "symbol": "SWDY.CA",
+      "qty": 310,
+      "price": 116.1166,
+      "ref_price": 116.0,
+      "cost": 36023.1576,
+      "fees": 26.9971,
+      "slippage": 36.1605,
+      "requested_qty": 310,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-10-11T17:45:50.145089+00:00",
+      "side": "BUY",
+      "symbol": "HRHO.CA",
+      "qty": 1766,
+      "price": 26.5967,
+      "ref_price": 26.57,
+      "cost": 47004.9363,
+      "fees": 35.2273,
+      "slippage": 47.0895,
+      "requested_qty": 1766,
       "adv_known": true
     }
   ],
@@ -2917,6 +2960,41 @@
           "current_price": 116.0,
           "market_value": 10904.0,
           "unrealized_pnl": -400.12,
+          "side": "long"
+        }
+      ]
+    },
+    {
+      "date": "2026-10-11",
+      "equity": 913019.34,
+      "cash": 772342.72,
+      "pnl": -86980.66,
+      "positions": [
+        {
+          "symbol": "ABUK.CA",
+          "qty": 521.0,
+          "avg_entry": 90.5027,
+          "current_price": 90.0,
+          "market_value": 46890.0,
+          "unrealized_pnl": -261.93,
+          "side": "long"
+        },
+        {
+          "symbol": "SWDY.CA",
+          "qty": 404.0,
+          "avg_entry": 117.1467,
+          "current_price": 116.0,
+          "market_value": 46864.0,
+          "unrealized_pnl": -463.28,
+          "side": "long"
+        },
+        {
+          "symbol": "HRHO.CA",
+          "qty": 1766.0,
+          "avg_entry": 26.6166,
+          "current_price": 26.57,
+          "market_value": 46922.62,
+          "unrealized_pnl": -82.32,
           "side": "long"
         }
       ]
