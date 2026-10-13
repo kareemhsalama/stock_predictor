@@ -1442,6 +1442,68 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-10-12",
+      "equity": 100378.97,
+      "cash": 74635.02,
+      "pnl": 378.97000000000116,
+      "positions": [
+        {
+          "symbol": "BAC",
+          "qty": 80.0,
+          "avg_entry": 59.43125,
+          "current_price": 54.72,
+          "market_value": 4377.6,
+          "unrealized_pnl": -376.9,
+          "side": "long"
+        },
+        {
+          "symbol": "HD",
+          "qty": 14.0,
+          "avg_entry": 320.5,
+          "current_price": 291.4,
+          "market_value": 4079.6,
+          "unrealized_pnl": -407.4,
+          "side": "long"
+        },
+        {
+          "symbol": "JNJ",
+          "qty": 15.0,
+          "avg_entry": 256.18,
+          "current_price": 265.5,
+          "market_value": 3982.5,
+          "unrealized_pnl": 139.8,
+          "side": "long"
+        },
+        {
+          "symbol": "JPM",
+          "qty": 13.0,
+          "avg_entry": 337.3,
+          "current_price": 336.0,
+          "market_value": 4368.0,
+          "unrealized_pnl": -16.9,
+          "side": "long"
+        },
+        {
+          "symbol": "KO",
+          "qty": 50.0,
+          "avg_entry": 86.22,
+          "current_price": 90.0,
+          "market_value": 4500.0,
+          "unrealized_pnl": 189.0,
+          "side": "long"
+        },
+        {
+          "symbol": "WMT",
+          "qty": 39.0,
+          "avg_entry": 104.12,
+          "current_price": 113.75,
+          "market_value": 4436.25,
+          "unrealized_pnl": 375.57,
+          "side": "long"
+        }
+      ]
     }
   ]
 }
