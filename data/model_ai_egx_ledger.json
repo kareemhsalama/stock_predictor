@@ -3033,6 +3033,41 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-10-13",
+      "equity": 906977.8,
+      "cash": 772342.72,
+      "pnl": -93022.2,
+      "positions": [
+        {
+          "symbol": "ABUK.CA",
+          "qty": 521.0,
+          "avg_entry": 90.5027,
+          "current_price": 85.98,
+          "market_value": 44795.58,
+          "unrealized_pnl": -2356.35,
+          "side": "long"
+        },
+        {
+          "symbol": "SWDY.CA",
+          "qty": 404.0,
+          "avg_entry": 117.1467,
+          "current_price": 112.0,
+          "market_value": 45248.0,
+          "unrealized_pnl": -2079.28,
+          "side": "long"
+        },
+        {
+          "symbol": "HRHO.CA",
+          "qty": 1766.0,
+          "avg_entry": 26.6166,
+          "current_price": 25.25,
+          "market_value": 44591.5,
+          "unrealized_pnl": -2413.44,
+          "side": "long"
+        }
+      ]
     }
   ],
   "extra": {
