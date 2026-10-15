@@ -13,15 +13,15 @@
     },
     "TMO": {
       "entry_date": "2026-08-24",
-      "peak_price": 680.645
+      "peak_price": 699.24
     },
     "XOM": {
       "entry_date": "2026-09-14",
-      "peak_price": 168.83
+      "peak_price": 174.04
     },
     "LLY": {
       "entry_date": "2026-09-14",
-      "peak_price": 1187.79
+      "peak_price": 1255.74
     },
     "AMD": {
       "entry_date": "2026-09-14",
@@ -29,11 +29,11 @@
     },
     "COP": {
       "entry_date": "2026-09-21",
-      "peak_price": 129.205
+      "peak_price": 141.09
     },
     "AMGN": {
       "entry_date": "2026-09-21",
-      "peak_price": 415.19
+      "peak_price": 436.74
     }
   }
 }
