@@ -1566,6 +1566,32 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-10-14",
+      "equity": 100151.96,
+      "cash": 92193.56,
+      "pnl": 151.9600000000064,
+      "positions": [
+        {
+          "symbol": "BAC",
+          "qty": 80.0,
+          "avg_entry": 59.43125,
+          "current_price": 51.48,
+          "market_value": 4118.4,
+          "unrealized_pnl": -636.1,
+          "side": "long"
+        },
+        {
+          "symbol": "JNJ",
+          "qty": 15.0,
+          "avg_entry": 256.18,
+          "current_price": 256.0,
+          "market_value": 3840.0,
+          "unrealized_pnl": -2.7,
+          "side": "long"
+        }
+      ]
     }
   ]
 }
