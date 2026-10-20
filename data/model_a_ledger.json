@@ -1959,6 +1959,32 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-10-19",
+      "equity": 102104.68,
+      "cash": 83973.63,
+      "pnl": 2104.679999999993,
+      "positions": [
+        {
+          "symbol": "GOOGL",
+          "qty": 26.0,
+          "avg_entry": 339.92,
+          "current_price": 344.3,
+          "market_value": 8951.8,
+          "unrealized_pnl": 113.88,
+          "side": "long"
+        },
+        {
+          "symbol": "TSLA",
+          "qty": 25.0,
+          "avg_entry": 351.8668,
+          "current_price": 367.17,
+          "market_value": 9179.25,
+          "unrealized_pnl": 382.58,
+          "side": "long"
+        }
+      ]
     }
   ]
 }
