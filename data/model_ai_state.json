@@ -1,5 +1,5 @@
 {
-  "peak_equity": 100913.63,
+  "peak_equity": 100974.91,
   "breaker_on": false,
   "bootstrapped": true,
   "positions": {
@@ -33,7 +33,7 @@
     },
     "AMGN": {
       "entry_date": "2026-09-21",
-      "peak_price": 437.85
+      "peak_price": 438.315
     }
   }
 }
