@@ -2011,6 +2011,41 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-10-21",
+      "equity": 102092.17,
+      "cash": 76802.87,
+      "pnl": 2092.1699999999983,
+      "positions": [
+        {
+          "symbol": "AAPL",
+          "qty": 24.0,
+          "avg_entry": 340.26,
+          "current_price": 343.51,
+          "market_value": 8244.24,
+          "unrealized_pnl": 78.0,
+          "side": "long"
+        },
+        {
+          "symbol": "GOOGL",
+          "qty": 26.0,
+          "avg_entry": 339.92,
+          "current_price": 333.5,
+          "market_value": 8671.0,
+          "unrealized_pnl": -166.92,
+          "side": "long"
+        },
+        {
+          "symbol": "NVDA",
+          "qty": 38.0,
+          "avg_entry": 220.843684,
+          "current_price": 220.37,
+          "market_value": 8374.06,
+          "unrealized_pnl": -17.999992,
+          "side": "long"
+        }
+      ]
     }
   ]
 }
