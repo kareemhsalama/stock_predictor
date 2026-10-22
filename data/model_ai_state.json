@@ -1,5 +1,5 @@
 {
-  "peak_equity": 100974.91,
+  "peak_equity": 101416.84,
   "breaker_on": false,
   "bootstrapped": true,
   "positions": {
@@ -21,7 +21,7 @@
     },
     "LLY": {
       "entry_date": "2026-09-14",
-      "peak_price": 1285.61
+      "peak_price": 1306.37
     },
     "AMD": {
       "entry_date": "2026-09-14",
@@ -33,7 +33,7 @@
     },
     "AMGN": {
       "entry_date": "2026-09-21",
-      "peak_price": 438.315
+      "peak_price": 447.78
     }
   }
 }
