@@ -4,15 +4,15 @@
   "market": "EGX",
   "currency": "EGP",
   "initial_budget": 1000000.0,
-  "cash": 884143.437516903,
+  "cash": 881282.2393435148,
   "positions": {
-    "COMI.CA": {
-      "qty": 760,
-      "avg_price": 129.22612477166655
+    "SWDY.CA": {
+      "qty": 913,
+      "avg_price": 107.1288294303022
     }
   },
-  "fees_paid": 2251.6395,
-  "slippage_paid": 3017.1561,
+  "fees_paid": 2396.205,
+  "slippage_paid": 3211.5677,
   "cost_model_from": "2026-08-20",
   "cost_model": {
     "commission_bps": 5.0,
@@ -568,6 +568,33 @@
       "fees": 73.6037,
       "slippage": 98.2511,
       "requested_qty": 760,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-10-25T16:41:05.948392+00:00",
+      "side": "SELL",
+      "symbol": "COMI.CA",
+      "qty": 760,
+      "price": 125.0246,
+      "ref_price": 125.15,
+      "proceeds": 94947.4231,
+      "fees": 71.264,
+      "slippage": 95.314,
+      "pnl": -3264.4317,
+      "requested_qty": 760,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-10-25T16:41:08.085650+00:00",
+      "side": "BUY",
+      "symbol": "SWDY.CA",
+      "qty": 913,
+      "price": 107.0485,
+      "ref_price": 106.94,
+      "cost": 97808.6213,
+      "fees": 73.3015,
+      "slippage": 99.0976,
+      "requested_qty": 913,
       "adv_known": true
     }
   ],
@@ -1501,6 +1528,23 @@
           "current_price": 129.0,
           "market_value": 98040.0,
           "unrealized_pnl": -171.85,
+          "side": "long"
+        }
+      ]
+    },
+    {
+      "date": "2026-10-25",
+      "equity": 978918.46,
+      "cash": 881282.24,
+      "pnl": -21081.54,
+      "positions": [
+        {
+          "symbol": "SWDY.CA",
+          "qty": 913.0,
+          "avg_entry": 107.1288,
+          "current_price": 106.94,
+          "market_value": 97636.22,
+          "unrealized_pnl": -172.4,
           "side": "long"
         }
       ]
