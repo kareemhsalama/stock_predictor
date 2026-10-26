@@ -4,15 +4,10 @@
   "market": "EGX",
   "currency": "EGP",
   "initial_budget": 1000000.0,
-  "cash": 881282.2393435148,
-  "positions": {
-    "SWDY.CA": {
-      "qty": 913,
-      "avg_price": 107.1288294303022
-    }
-  },
-  "fees_paid": 2396.205,
-  "slippage_paid": 3211.5677,
+  "cash": 974262.1260481268,
+  "positions": {},
+  "fees_paid": 2465.9923,
+  "slippage_paid": 3306.1507,
   "cost_model_from": "2026-08-20",
   "cost_model": {
     "commission_bps": 5.0,
@@ -594,6 +589,20 @@
       "cost": 97808.6213,
       "fees": 73.3015,
       "slippage": 99.0976,
+      "requested_qty": 913,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-10-26T18:47:42.322163+00:00",
+      "side": "SELL",
+      "symbol": "SWDY.CA",
+      "qty": 913,
+      "price": 101.9164,
+      "ref_price": 102.02,
+      "proceeds": 92979.8867,
+      "fees": 69.7873,
+      "slippage": 94.583,
+      "pnl": -4828.7346,
       "requested_qty": 913,
       "adv_known": true
     }
@@ -1548,6 +1557,13 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-10-26",
+      "equity": 974262.13,
+      "cash": 974262.13,
+      "pnl": -25737.87,
+      "positions": []
     }
   ],
   "extra": {}
