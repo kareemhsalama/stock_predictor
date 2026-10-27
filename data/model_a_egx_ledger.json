@@ -4,10 +4,19 @@
   "market": "EGX",
   "currency": "EGP",
   "initial_budget": 1000000.0,
-  "cash": 974262.1260481268,
-  "positions": {},
-  "fees_paid": 2465.9923,
-  "slippage_paid": 3306.1507,
+  "cash": 789266.2332312434,
+  "positions": {
+    "COMI.CA": {
+      "qty": 809,
+      "avg_price": 120.31050047248456
+    },
+    "SWDY.CA": {
+      "qty": 846,
+      "avg_price": 103.62257439083139
+    }
+  },
+  "fees_paid": 2604.6352,
+  "slippage_paid": 3492.2597,
   "cost_model_from": "2026-08-20",
   "cost_model": {
     "commission_bps": 5.0,
@@ -604,6 +613,32 @@
       "slippage": 94.583,
       "pnl": -4828.7346,
       "requested_qty": 913,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-10-27T18:09:34.849322+00:00",
+      "side": "BUY",
+      "symbol": "COMI.CA",
+      "qty": 809,
+      "price": 120.2203,
+      "ref_price": 120.1,
+      "cost": 97331.1949,
+      "fees": 72.9437,
+      "slippage": 97.3524,
+      "requested_qty": 809,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-10-27T18:09:36.121224+00:00",
+      "side": "BUY",
+      "symbol": "SWDY.CA",
+      "qty": 846,
+      "price": 103.5449,
+      "ref_price": 103.44,
+      "cost": 87664.6979,
+      "fees": 65.6992,
+      "slippage": 88.7566,
+      "requested_qty": 846,
       "adv_known": true
     }
   ],
@@ -1564,6 +1599,32 @@
       "cash": 974262.13,
       "pnl": -25737.87,
       "positions": []
+    },
+    {
+      "date": "2026-10-27",
+      "equity": 973937.37,
+      "cash": 789266.23,
+      "pnl": -26062.63,
+      "positions": [
+        {
+          "symbol": "COMI.CA",
+          "qty": 809.0,
+          "avg_entry": 120.3105,
+          "current_price": 120.1,
+          "market_value": 97160.9,
+          "unrealized_pnl": -170.3,
+          "side": "long"
+        },
+        {
+          "symbol": "SWDY.CA",
+          "qty": 846.0,
+          "avg_entry": 103.6226,
+          "current_price": 103.44,
+          "market_value": 87510.24,
+          "unrealized_pnl": -154.46,
+          "side": "long"
+        }
+      ]
     }
   ],
   "extra": {}
