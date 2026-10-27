@@ -2107,6 +2107,32 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-10-26",
+      "equity": 101722.66,
+      "cash": 85238.2,
+      "pnl": 1722.6600000000035,
+      "positions": [
+        {
+          "symbol": "AAPL",
+          "qty": 24.0,
+          "avg_entry": 340.26,
+          "current_price": 343.38,
+          "market_value": 8241.12,
+          "unrealized_pnl": 74.88,
+          "side": "long"
+        },
+        {
+          "symbol": "NVDA",
+          "qty": 38.0,
+          "avg_entry": 220.843684,
+          "current_price": 216.93,
+          "market_value": 8243.34,
+          "unrealized_pnl": -148.719992,
+          "side": "long"
+        }
+      ]
     }
   ]
 }
