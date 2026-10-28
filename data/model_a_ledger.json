@@ -2133,6 +2133,41 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-10-27",
+      "equity": 101891.26,
+      "cash": 76108.32,
+      "pnl": 1891.2599999999948,
+      "positions": [
+        {
+          "symbol": "GOOGL",
+          "qty": 26.0,
+          "avg_entry": 323.27,
+          "current_price": 326.0,
+          "market_value": 8476.0,
+          "unrealized_pnl": 70.98,
+          "side": "long"
+        },
+        {
+          "symbol": "MSFT",
+          "qty": 17.0,
+          "avg_entry": 532.62,
+          "current_price": 531.7,
+          "market_value": 9038.9,
+          "unrealized_pnl": -15.64,
+          "side": "long"
+        },
+        {
+          "symbol": "NVDA",
+          "qty": 38.0,
+          "avg_entry": 220.843684,
+          "current_price": 217.58,
+          "market_value": 8268.04,
+          "unrealized_pnl": -124.019992,
+          "side": "long"
+        }
+      ]
     }
   ]
 }
