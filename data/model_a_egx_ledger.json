@@ -4,15 +4,19 @@
   "market": "EGX",
   "currency": "EGP",
   "initial_budget": 1000000.0,
-  "cash": 882867.3647077826,
+  "cash": 794594.3887897162,
   "positions": {
     "COMI.CA": {
       "qty": 816,
       "avg_price": 120.11014603035822
+    },
+    "TMGH.CA": {
+      "qty": 1096,
+      "avg_price": 80.54103642159346
     }
   },
-  "fees_paid": 2821.9036,
-  "slippage_paid": 3783.8202,
+  "fees_paid": 2888.0587,
+  "slippage_paid": 3872.2393,
   "cost_model_from": "2026-08-20",
   "cost_model": {
     "commission_bps": 5.0,
@@ -676,6 +680,19 @@
       "fees": 73.4523,
       "slippage": 98.0256,
       "requested_qty": 816,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-11-01T18:01:34.638563+00:00",
+      "side": "BUY",
+      "symbol": "TMGH.CA",
+      "qty": 1096,
+      "price": 80.4807,
+      "ref_price": 80.4,
+      "cost": 88272.9759,
+      "fees": 66.1551,
+      "slippage": 88.4191,
+      "requested_qty": 1096,
       "adv_known": true
     }
   ],
@@ -1683,6 +1700,32 @@
           "current_price": 119.9,
           "market_value": 97838.4,
           "unrealized_pnl": -171.48,
+          "side": "long"
+        }
+      ]
+    },
+    {
+      "date": "2026-11-01",
+      "equity": 981016.31,
+      "cash": 794594.39,
+      "pnl": -18983.69,
+      "positions": [
+        {
+          "symbol": "COMI.CA",
+          "qty": 816.0,
+          "avg_entry": 120.1101,
+          "current_price": 120.47,
+          "market_value": 98303.52,
+          "unrealized_pnl": 293.64,
+          "side": "long"
+        },
+        {
+          "symbol": "TMGH.CA",
+          "qty": 1096.0,
+          "avg_entry": 80.541,
+          "current_price": 80.4,
+          "market_value": 88118.4,
+          "unrealized_pnl": -154.57,
           "side": "long"
         }
       ]
