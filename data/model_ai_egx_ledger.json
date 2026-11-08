@@ -4,10 +4,19 @@
   "market": "EGX",
   "currency": "EGP",
   "initial_budget": 1000000.0,
-  "cash": 907739.4002051172,
-  "positions": {},
-  "fees_paid": 2074.8277,
-  "slippage_paid": 2763.8208,
+  "cash": 889094.617564977,
+  "positions": {
+    "ABUK.CA": {
+      "qty": 115,
+      "avg_price": 81.16828463818257
+    },
+    "SWDY.CA": {
+      "qty": 80,
+      "avg_price": 116.38037383436497
+    }
+  },
+  "fees_paid": 2099.4827,
+  "slippage_paid": 2782.448,
   "cost_model_from": "2026-08-20",
   "cost_model": {
     "commission_bps": 5.0,
@@ -669,6 +678,32 @@
       "slippage": 10.0436,
       "pnl": -1124.2367,
       "requested_qty": 95,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-11-08T18:02:56.046121+00:00",
+      "side": "BUY",
+      "symbol": "ABUK.CA",
+      "qty": 115,
+      "price": 81.0611,
+      "ref_price": 80.98,
+      "cost": 9334.3527,
+      "fees": 12.3305,
+      "slippage": 9.3218,
+      "requested_qty": 115,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-11-08T18:02:56.517404+00:00",
+      "side": "BUY",
+      "symbol": "SWDY.CA",
+      "qty": 80,
+      "price": 116.2263,
+      "ref_price": 116.11,
+      "cost": 9310.4299,
+      "fees": 12.3245,
+      "slippage": 9.3053,
+      "requested_qty": 80,
       "adv_known": true
     }
   ],
@@ -3319,6 +3354,32 @@
       "cash": 907739.4,
       "pnl": -92260.6,
       "positions": []
+    },
+    {
+      "date": "2026-11-08",
+      "equity": 907696.12,
+      "cash": 889094.62,
+      "pnl": -92303.88,
+      "positions": [
+        {
+          "symbol": "ABUK.CA",
+          "qty": 115.0,
+          "avg_entry": 81.1683,
+          "current_price": 80.98,
+          "market_value": 9312.7,
+          "unrealized_pnl": -21.65,
+          "side": "long"
+        },
+        {
+          "symbol": "SWDY.CA",
+          "qty": 80.0,
+          "avg_entry": 116.3804,
+          "current_price": 116.11,
+          "market_value": 9288.8,
+          "unrealized_pnl": -21.63,
+          "side": "long"
+        }
+      ]
     }
   ],
   "extra": {
