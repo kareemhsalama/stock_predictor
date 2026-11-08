@@ -1814,6 +1814,23 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-11-08",
+      "equity": 981442.99,
+      "cash": 882498.99,
+      "pnl": -18557.01,
+      "positions": [
+        {
+          "symbol": "COMI.CA",
+          "qty": 773.0,
+          "avg_entry": 126.7317,
+          "current_price": 128.0,
+          "market_value": 98944.0,
+          "unrealized_pnl": 980.38,
+          "side": "long"
+        }
+      ]
     }
   ],
   "extra": {}
