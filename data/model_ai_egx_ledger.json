@@ -3380,10 +3380,39 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-11-09",
+      "equity": 907301.12,
+      "cash": 889094.62,
+      "pnl": -92698.88,
+      "positions": [
+        {
+          "symbol": "ABUK.CA",
+          "qty": 115.0,
+          "avg_entry": 81.1683,
+          "current_price": 76.3,
+          "market_value": 8774.5,
+          "unrealized_pnl": -559.85,
+          "side": "long"
+        },
+        {
+          "symbol": "SWDY.CA",
+          "qty": 80.0,
+          "avg_entry": 116.3804,
+          "current_price": 117.9,
+          "market_value": 9432.0,
+          "unrealized_pnl": 121.57,
+          "side": "long"
+        }
+      ]
     }
   ],
   "extra": {
-    "peak_price": {},
+    "peak_price": {
+      "ABUK.CA": 76.30000305175781,
+      "SWDY.CA": 117.9000015258789
+    },
     "bootstrapped": true
   }
 }
