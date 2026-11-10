@@ -2079,6 +2079,32 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-11-09",
+      "equity": 99497.87,
+      "cash": 91714.47,
+      "pnl": -502.13000000000466,
+      "positions": [
+        {
+          "symbol": "BAC",
+          "qty": 80.0,
+          "avg_entry": 59.43125,
+          "current_price": 50.5623,
+          "market_value": 4044.984,
+          "unrealized_pnl": -709.516,
+          "side": "long"
+        },
+        {
+          "symbol": "NVDA",
+          "qty": 21.0,
+          "avg_entry": 214.79,
+          "current_price": 178.02,
+          "market_value": 3738.42,
+          "unrealized_pnl": -772.17,
+          "side": "long"
+        }
+      ]
     }
   ]
 }
