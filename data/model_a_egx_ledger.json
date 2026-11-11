@@ -4,10 +4,15 @@
   "market": "EGX",
   "currency": "EGP",
   "initial_budget": 1000000.0,
-  "cash": 980737.2950966802,
-  "positions": {},
-  "fees_paid": 3174.7162,
-  "slippage_paid": 4255.4732,
+  "cash": 882708.7892180376,
+  "positions": {
+    "COMI.CA": {
+      "qty": 747,
+      "avg_price": 131.22959287636226
+    }
+  },
+  "fees_paid": 3248.1825,
+  "slippage_paid": 4353.5128,
   "cost_model_from": "2026-08-20",
   "cost_model": {
     "commission_bps": 5.0,
@@ -739,6 +744,19 @@
       "slippage": 98.5912,
       "pnl": 274.6811,
       "requested_qty": 773,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-11-11T19:47:14.456120+00:00",
+      "side": "BUY",
+      "symbol": "COMI.CA",
+      "qty": 747,
+      "price": 131.1312,
+      "ref_price": 131.0,
+      "cost": 98028.5059,
+      "fees": 73.4663,
+      "slippage": 98.0396,
+      "requested_qty": 747,
       "adv_known": true
     }
   ],
@@ -1854,6 +1872,23 @@
       "cash": 980737.3,
       "pnl": -19262.7,
       "positions": []
+    },
+    {
+      "date": "2026-11-11",
+      "equity": 980565.79,
+      "cash": 882708.79,
+      "pnl": -19434.21,
+      "positions": [
+        {
+          "symbol": "COMI.CA",
+          "qty": 747.0,
+          "avg_entry": 131.2296,
+          "current_price": 131.0,
+          "market_value": 97857.0,
+          "unrealized_pnl": -171.51,
+          "side": "long"
+        }
+      ]
     }
   ],
   "extra": {}
