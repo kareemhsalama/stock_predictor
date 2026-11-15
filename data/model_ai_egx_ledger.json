@@ -4,15 +4,19 @@
   "market": "EGX",
   "currency": "EGP",
   "initial_budget": 1000000.0,
-  "cash": 897612.68969018,
+  "cash": 886532.843699626,
   "positions": {
     "SWDY.CA": {
       "qty": 80,
       "avg_price": 116.38037383436497
+    },
+    "EAST.CA": {
+      "qty": 320,
+      "avg_price": 34.624518720481106
     }
   },
-  "fees_paid": 2111.6153,
-  "slippage_paid": 2790.9933,
+  "fees_paid": 2124.3821,
+  "slippage_paid": 2802.0728,
   "cost_model_from": "2026-08-20",
   "cost_model": {
     "commission_bps": 5.0,
@@ -714,6 +718,19 @@
       "slippage": 8.5453,
       "pnl": -816.2806,
       "requested_qty": 115,
+      "adv_known": true
+    },
+    {
+      "timestamp": "2026-11-15T19:03:26.758507+00:00",
+      "side": "BUY",
+      "symbol": "EAST.CA",
+      "qty": 320,
+      "price": 34.5846,
+      "ref_price": 34.55,
+      "cost": 11079.846,
+      "fees": 12.7668,
+      "slippage": 11.0795,
+      "requested_qty": 320,
       "adv_known": true
     }
   ],
@@ -3464,6 +3481,32 @@
           "current_price": 121.46,
           "market_value": 9716.8,
           "unrealized_pnl": 406.37,
+          "side": "long"
+        }
+      ]
+    },
+    {
+      "date": "2026-11-15",
+      "equity": 907244.84,
+      "cash": 886532.84,
+      "pnl": -92755.16,
+      "positions": [
+        {
+          "symbol": "SWDY.CA",
+          "qty": 80.0,
+          "avg_entry": 116.3804,
+          "current_price": 120.7,
+          "market_value": 9656.0,
+          "unrealized_pnl": 345.57,
+          "side": "long"
+        },
+        {
+          "symbol": "EAST.CA",
+          "qty": 320.0,
+          "avg_entry": 34.6245,
+          "current_price": 34.55,
+          "market_value": 11056.0,
+          "unrealized_pnl": -23.85,
           "side": "long"
         }
       ]
