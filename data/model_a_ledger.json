@@ -2578,6 +2578,41 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-11-16",
+      "equity": 98978.61,
+      "cash": 75450.99,
+      "pnl": -1021.3899999999994,
+      "positions": [
+        {
+          "symbol": "GOOGL",
+          "qty": 31.0,
+          "avg_entry": 279.12,
+          "current_price": 284.4,
+          "market_value": 8816.4,
+          "unrealized_pnl": 163.68,
+          "side": "long"
+        },
+        {
+          "symbol": "NVDA",
+          "qty": 38.0,
+          "avg_entry": 220.843684,
+          "current_price": 157.44,
+          "market_value": 5982.72,
+          "unrealized_pnl": -2409.339992,
+          "side": "long"
+        },
+        {
+          "symbol": "TSLA",
+          "qty": 23.0,
+          "avg_entry": 360.065217,
+          "current_price": 379.5,
+          "market_value": 8728.5,
+          "unrealized_pnl": 447.000009,
+          "side": "long"
+        }
+      ]
     }
   ]
 }
