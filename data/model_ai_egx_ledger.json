@@ -3640,6 +3640,32 @@
           "side": "long"
         }
       ]
+    },
+    {
+      "date": "2026-11-23",
+      "equity": 906088.84,
+      "cash": 886532.84,
+      "pnl": -93911.16,
+      "positions": [
+        {
+          "symbol": "SWDY.CA",
+          "qty": 80.0,
+          "avg_entry": 116.3804,
+          "current_price": 114.05,
+          "market_value": 9124.0,
+          "unrealized_pnl": -186.43,
+          "side": "long"
+        },
+        {
+          "symbol": "EAST.CA",
+          "qty": 320.0,
+          "avg_entry": 34.6245,
+          "current_price": 32.6,
+          "market_value": 10432.0,
+          "unrealized_pnl": -647.85,
+          "side": "long"
+        }
+      ]
     }
   ],
   "extra": {
